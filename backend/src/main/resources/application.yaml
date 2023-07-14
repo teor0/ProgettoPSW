@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: progettopsw
+
+  datasource:
+    username: 'postgres'
+    password: 'admin'
+    url: jdbc:postgresql://localhost:5432/postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database: postgresql
+    show-sql: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: none
+
+server:
+  port: 8080
+  error:
+    include-message: always
+
+
