@@ -1,10 +1,13 @@
-package services;
-import exceptions.MailAlreadyExistsException;
+package application.services;
+import application.entities.Utente;
+import application.support.dto.UtenteDTO;
+import application.support.exceptions.UtenteNotExistsException;
+import application.support.exceptions.MailAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import repositories.UtenteRepository;
-import entities.Utente;
+import application.repositories.UtenteRepository;
+
 import java.util.*;
 
 @Service
@@ -24,14 +27,16 @@ public class UtenteService {
     }
 
     @Transactional
-    public long create(Utente u) throws MailAlreadyExistsException {
+    public void addUtente(Utente u) throws MailAlreadyExistsException {
         if(repo.existsByEmail(u.getEmail()))
             throw new MailAlreadyExistsException();
-        return repo.save(u).getId();
+        repo.save(u);
     }
     @Transactional
-    public boolean delete(long id){
-        repo.deleteById(id);
+    public boolean delete(UtenteDTO dto) throws UtenteNotExistsException {
+        if(!repo.existsById(dto.getId()))
+            throw new UtenteNotExistsException();
+        repo.deleteById(dto.getId());
         return true;
     }
 

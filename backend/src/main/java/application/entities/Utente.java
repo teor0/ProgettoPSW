@@ -1,4 +1,4 @@
-package entities;
+package application.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -10,8 +10,6 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @Data
 @Entity
-@NoArgsConstructor
-@RequiredArgsConstructor
 @Table(name = "utente")
 public class Utente {
     @Id

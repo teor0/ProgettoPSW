@@ -1,22 +1,42 @@
+keycloak:
+  resource: TestClient
+
 spring:
   application:
     name: progettopsw
-
   datasource:
     username: 'postgres'
     password: 'admin'
     url: jdbc:postgresql://localhost:5432/postgres
     driver-class-name: org.postgresql.Driver
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8081/auth/realms/TestClient/protocol/openid-connect/certs
+          issuer-uri: http://localhost:8081/auth/realms/TestClient
+
+
   jpa:
     database: postgresql
     show-sql: true
     generate-ddl: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL82Dialect
 
 server:
+  compression:
+    enabled: 'true'
   port: 8080
   error:
     include-message: always
+
+logging:
+  level:
+    org:
+      springframework: INFO
 
 

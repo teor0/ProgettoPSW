@@ -1,4 +1,4 @@
-package entities;
+package application.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import java.util.*;
 
-import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Data
@@ -32,10 +31,11 @@ public class Product {
     @Column(name = "name")
     private String name;
 
+    @Basic
+    @Size(max = 30)
     @NotNull
-    @ManyToOne(fetch = EAGER)
-    @JoinColumn(name = "category")
-    private Category category;
+    @Column(name = "category")
+    private String category;
 
     @Basic
     @NotNull
@@ -57,7 +57,6 @@ public class Product {
     @Version
     @NotNull
     @Column(name = "version")
-    @JsonIgnore
     private long version;
 
     @JsonIgnore

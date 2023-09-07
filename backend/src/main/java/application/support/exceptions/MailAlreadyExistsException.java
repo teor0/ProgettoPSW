@@ -1,4 +1,4 @@
-package exceptions;
+package application.support.exceptions;
 
 public class MailAlreadyExistsException extends Exception{
 

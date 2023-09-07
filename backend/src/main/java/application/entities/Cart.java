@@ -1,4 +1,4 @@
-package entities;
+package application.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -23,5 +23,10 @@ public class Cart {
     @ManyToOne(fetch = EAGER)
     @JoinColumn(name = "order_id")
     private Order order;
+
+    @NotNull
+    @Column(name = "version")
+    @Version
+    private long version;
 
 }
