@@ -1,28 +1,31 @@
 package application.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import static jakarta.persistence.FetchType.EAGER;
-import static jakarta.persistence.FetchType.LAZY;
-import java.time.LocalDate;
 import java.util.*;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
 @Entity
 @Table(name = "\"order\"")
 public class Order {
     @Id
-    @NotNull
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @NotNull
     @ManyToOne(fetch = EAGER)
     @JoinColumn(name = "user_id")
+    //annotazione che forse con il front end non servira
+    @JsonBackReference(value = "user-orders")
     private Utente user;
 
     @Basic
@@ -31,13 +34,24 @@ public class Order {
     private Double total;
 
     @Basic
-    @Temporal(TemporalType.DATE)
-    @NotNull
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     @Column(name = "create_date")
-    private LocalDate createDate;
+    private Date createDate;
 
-    @JsonIgnore
+    @Basic
+    @Column(name = "status")
+    private String status="Pending";
+
     @ToString.Exclude
-    @OneToMany(fetch = LAZY,mappedBy = "order",cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<OrderProduct> orderProducts = new LinkedHashSet<>();
+    @OneToMany(fetch = EAGER,mappedBy = "order",cascade = {CascadeType.REMOVE,CascadeType.MERGE}, orphanRemoval = true)
+    @JsonManagedReference(value = "orderproducts")
+    private List<OrderProducts> orderProducts;
+
+    @ToString.Exclude
+    @OneToOne(mappedBy = "order")
+    @JsonBackReference(value = "cart")
+    @JsonIgnore
+    private Cart cart;
+
 }

@@ -1,32 +1,33 @@
 package application.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import static jakarta.persistence.FetchType.EAGER;
 
 @Data
 @Entity
 @Table(name = "cart")
 public class Cart {
     @Id
-    @NotNull
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @NotNull
     @OneToOne
+    @JsonManagedReference(value = "user")
     @JoinColumn(name = "user_id")
     private Utente user;
 
-    @NotNull
-    @ManyToOne(fetch = EAGER)
+    @OneToOne
+    @JsonManagedReference(value = "cart")
+    //@JsonIgnore
     @JoinColumn(name = "order_id")
     private Order order;
 
     @NotNull
     @Column(name = "version")
     @Version
-    private long version;
+    private Long version;
 
 }

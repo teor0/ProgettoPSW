@@ -1,20 +1,19 @@
 package application.services;
 
 import application.entities.Order;
-import application.entities.OrderProduct;
+import application.entities.OrderProducts;
 import application.entities.Utente;
 import application.repositories.OrderProductRepository;
 import application.repositories.OrderRepository;
 import application.support.dto.OrderDTO;
-import application.support.dto.UtenteDTO;
 import application.support.exceptions.OrderAlreadyExistsException;
 import application.support.exceptions.OrderNotExistsException;
-import application.support.exceptions.ProductNotExistsException;
+import application.support.exceptions.UtenteNotExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import application.repositories.UtenteRepository;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -29,31 +28,36 @@ public class OrderService{
     private UtenteRepository urepo;
 
 
-    @Transactional
-    public void createOrder(Order o) throws OrderAlreadyExistsException {
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void addOrder(Order o) throws OrderAlreadyExistsException, UtenteNotExistsException {
         if(repo.existsById(o.getId()))
             throw new OrderAlreadyExistsException();
+        if(!urepo.existsById(o.getUser().getId()))
+            throw new UtenteNotExistsException();
         repo.save(o);
     }
 
-    @Transactional
-    public void deleteOrder(OrderDTO dto) throws OrderNotExistsException {
-        if(!repo.existsById(dto.getId()))
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void deleteOrder(Long id) throws OrderNotExistsException, UtenteNotExistsException {
+        if(!repo.existsById(id))
             throw new OrderNotExistsException();
-        Order o = repo.findById(dto.getId()).get();
-        List<OrderProduct> ops = oprepo.findByOrder(o);
+        Order o = repo.findById(id).get();
+        List<OrderProducts> ops = oprepo.findByOrder(o);
         oprepo.deleteAll(ops);
+        if(!urepo.existsById(o.getUser().getId()))
+            throw new UtenteNotExistsException();
+        Utente u = urepo.findById(o.getUser().getId()).get();
+        u.getOrders().remove(o);
         repo.delete(o);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void updateOrder(OrderDTO dto) throws OrderNotExistsException {
         if(!repo.existsById(dto.getId()))
             throw new OrderNotExistsException();
         Order o = repo.findById(dto.getId()).get();
         o.setTotal(dto.getTotal());
         o.setCreateDate(dto.getCreateDate());
-        repo.flush();
     }
 
     @Transactional(readOnly = true)
@@ -62,15 +66,25 @@ public class OrderService{
     }
 
     @Transactional(readOnly = true)
-    public List<Order> showByUser(UtenteDTO dto) throws ProductNotExistsException {
-        if(!urepo.existsById(dto.getId()))
-            throw new ProductNotExistsException();
-        Utente u = urepo.findById(dto.getId()).get();
-        return repo.findByUser(u);
+    public List<Order> showByStatus(String status){
+        return repo.findByStatus(status);
     }
 
+    @Transactional(readOnly = true)
+    public List<Order> showByUserAndStatus(Long id,String status) throws UtenteNotExistsException {
+        if(!urepo.existsById(id))
+            throw new UtenteNotExistsException();
+        Utente u = urepo.findById(id).get();
+        return repo.findByUserAndStatus(u,status);
+    }
 
-
+    @Transactional(readOnly = true)
+    public List<Order> showByUser(Long id) throws UtenteNotExistsException {
+        if(!urepo.existsById(id))
+            throw new UtenteNotExistsException();
+        Utente u = urepo.findById(id).get();
+        return repo.findByUser(u);
+    }
 
 
 }

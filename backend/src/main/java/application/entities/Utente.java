@@ -1,6 +1,8 @@
 package application.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -8,14 +10,15 @@ import lombok.*;
 import java.util.*;
 import static jakarta.persistence.FetchType.LAZY;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
 @Entity
 @Table(name = "utente")
 public class Utente {
     @Id
-    @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Long id;
 
     @Basic
@@ -30,15 +33,15 @@ public class Utente {
     @Column(name = "email")
     private String email;
 
-    @JsonIgnore
     @ToString.Exclude
-    @OneToMany(fetch = LAZY,mappedBy = "user",cascade = CascadeType.MERGE, orphanRemoval = true)
-    private Set<Order> orders = new LinkedHashSet<>();
+    @OneToMany(fetch = LAZY,mappedBy = "user",cascade = {CascadeType.MERGE}, orphanRemoval = true)
+    @JsonManagedReference(value = "user-orders")
+    @JsonIgnore
+    private List<Order> orders;
 
-    @JsonIgnore
     @ToString.Exclude
-    @OneToOne(fetch = LAZY,mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonBackReference(value = "user")
+    @OneToOne(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Cart cart;
-
 
 }

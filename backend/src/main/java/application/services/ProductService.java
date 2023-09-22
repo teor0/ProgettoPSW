@@ -1,16 +1,21 @@
 package application.services;
+
+import application.entities.Order;
+import application.entities.OrderProducts;
 import application.entities.Product;
 import application.repositories.OrderProductRepository;
+import application.repositories.OrderRepository;
 import application.repositories.ProductRepository;
 import application.support.dto.ProductDTO;
+import application.support.exceptions.OrderNotExistsException;
 import application.support.exceptions.ProductAlreadyExistsException;
 import application.support.exceptions.ProductNotExistsException;
 import application.support.exceptions.UncorrectPriceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 
 @Service
@@ -20,77 +25,83 @@ public class ProductService {
     private ProductRepository prrepo;
     @Autowired
     private OrderProductRepository oprepo;
+    @Autowired
+    private OrderRepository orepo;
 
     @Transactional
     public void addProduct(Product p) throws ProductAlreadyExistsException {
-        if(!prrepo.existsByBarCode(p.getBarCode()))
+        if(prrepo.existsByBarCode(p.getBarCode()))
             throw new ProductAlreadyExistsException();
         prrepo.save(p);
     }
 
-    @Transactional
-    public boolean deleteProduct(ProductDTO dto) throws ProductNotExistsException {
-        if(!prrepo.existsById(dto.getId()))
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public boolean deleteProduct(Long id) throws ProductNotExistsException {
+        if(!prrepo.existsById(id))
             throw new ProductNotExistsException();
         // il warning di get è gestito subito tramite existsById
-        Product p=prrepo.findById(dto.getId()).get();
-        oprepo.deleteAll(oprepo.findByProduct(p)); //codice possibilmente fuorviante in quanto esiste CASCADE.REMOVE
+        Product p=prrepo.findById(id).get();
         prrepo.delete(p);
         return true;
     }
 
-    @Transactional
-    public void updateProduct(ProductDTO dto) throws ProductNotExistsException, ProductAlreadyExistsException {
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void updateProductName(ProductDTO dto) throws ProductNotExistsException{
         if(!prrepo.existsById(dto.getId()))
             throw new ProductNotExistsException();
-        if(prrepo.existsByBarCode(dto.getBarCode()))
-            throw new ProductAlreadyExistsException();
-        String upBarcode = dto.getBarCode();
-        String upName = dto.getName();
-        String upCat = dto.getCategory();
-        String upDesc = dto.getDescription();
-        int upQuantity = dto.getQuantity();
-        double upPrice = dto.getPrice();
         Product oldProduct = prrepo.findById(dto.getId()).get();
-        oldProduct.setBarCode(upBarcode);
-        oldProduct.setName(upName);
-        oldProduct.setCategory(upCat);
-        oldProduct.setDescription(upDesc);
-        oldProduct.setQuantity(upQuantity);
-        oldProduct.setPrice(upPrice);
-        prrepo.flush();
+        oldProduct.setName(dto.getName());
     }
 
-    @Transactional
-    public void updatePrice(ProductDTO dto) throws ProductNotExistsException {
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void updateProductDesc(ProductDTO dto) throws ProductNotExistsException{
         if(!prrepo.existsById(dto.getId()))
             throw new ProductNotExistsException();
-        double upPrice = dto.getPrice();
-        Product p = prrepo.findById(dto.getId()).get();
-        p.setPrice(upPrice);
-        prrepo.flush();
+        Product oldProduct = prrepo.findById(dto.getId()).get();
+        oldProduct.setDescription(dto.getDescription());
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void updateProductCategory(ProductDTO dto) throws ProductNotExistsException{
+        if(!prrepo.existsById(dto.getId()))
+            throw new ProductNotExistsException();
+        Product oldProduct = prrepo.findById(dto.getId()).get();
+        oldProduct.setCategory(dto.getCategory());
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void updatePrice(ProductDTO dto) throws ProductNotExistsException, OrderNotExistsException {
+        if(!prrepo.existsById(dto.getId()))
+            throw new ProductNotExistsException();
+        Product p = prrepo.findById(dto.getId()).get();
+        p.setPrice(dto.getPrice());
+        List<OrderProducts> op= oprepo.findByProduct(p);
+        for(OrderProducts o: op) {
+            if(!orepo.existsById(o.getOrder().getId()))
+                throw new OrderNotExistsException();
+            Order ord= orepo.findById(o.getOrder().getId()).get();
+            ord.setTotal(ord.getTotal()-(o.getPrice()*o.getQuantity()));
+            o.setPrice(p.getPrice());
+            ord.setTotal(ord.getTotal()+(o.getPrice()*o.getQuantity()));
+        }
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void updateQuantity(ProductDTO dto) throws ProductNotExistsException {
         if(!prrepo.existsById(dto.getId()))
             throw new ProductNotExistsException();
-        int upQuantity = dto.getQuantity();
         Product p = prrepo.findById(dto.getId()).get();
-        p.setQuantity(upQuantity);
-        prrepo.flush();
+        p.setQuantity(dto.getQuantity());
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void updateBarCode(ProductDTO dto) throws ProductAlreadyExistsException, ProductNotExistsException {
         if(prrepo.existsByBarCode(dto.getBarCode()))
             throw new ProductAlreadyExistsException();
         if(!prrepo.existsById(dto.getId()))
             throw new ProductNotExistsException();
-        String upBarCode = dto.getBarCode();
         Product p = prrepo.findById(dto.getId()).get();
-        p.setBarCode(upBarCode);
-        prrepo.flush();
+        p.setBarCode(dto.getBarCode());
     }
 
     @Transactional(readOnly = true)
@@ -109,7 +120,9 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Product> showProductByBarCode(String barCode){
+    public Optional<Product> showProductByBarCode(String barCode) throws ProductNotExistsException {
+        if(!prrepo.existsByBarCode(barCode))
+            throw new ProductNotExistsException();
         return prrepo.findByBarCode(barCode);
     }
 
@@ -147,7 +160,4 @@ public class ProductService {
             throw new UncorrectPriceException();
         return prrepo.findByPriceIsLessThanEqual(p);
     }
-
-
-
 }
