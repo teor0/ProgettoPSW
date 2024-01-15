@@ -6,6 +6,7 @@ import application.entities.Product;
 import application.repositories.OrderProductRepository;
 import application.repositories.ProductRepository;
 import application.support.dto.OrderProductsDTO;
+import application.support.exceptions.OrderHandledException;
 import application.support.exceptions.OrderNotExistsException;
 import application.support.exceptions.OrderProductsNotExistsException;
 import application.support.exceptions.ProductNotExistsException;
@@ -13,6 +14,7 @@ import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import application.repositories.OrderRepository;
 
@@ -26,8 +28,8 @@ public class OrderProductService {
     @Autowired
     private ProductRepository prepo;
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void createOrderProduct(OrderProductsDTO dto) throws OrderNotExistsException, ProductNotExistsException {
+    @Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = {OrderHandledException.class,ProductNotExistsException.class}, propagation = Propagation.REQUIRED)
+    public void createOrderProduct(OrderProductsDTO dto) throws OrderNotExistsException, ProductNotExistsException, OrderHandledException {
         if(!orepo.existsById(dto.getOrderId()))
             throw new OrderNotExistsException();
         if(!prepo.existsById(dto.getProductId()))
@@ -35,6 +37,8 @@ public class OrderProductService {
         OrderProducts op= new OrderProducts();
         op.setQuantity(dto.getQuantity());
         Order o= orepo.findById(dto.getOrderId()).get();
+        if(o.getStatus()=="Handled")
+            throw new OrderHandledException();
         Product p= prepo.findById(dto.getProductId()).get();
         op.setOrder(o);
         op.setProduct(p);
@@ -43,7 +47,7 @@ public class OrderProductService {
         repo.save(op);
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
     public void updateQta(OrderProductsDTO dto) throws OrderProductsNotExistsException{
         if(!repo.existsById(dto.getId()))
             throw new OrderProductsNotExistsException();
@@ -55,10 +59,11 @@ public class OrderProductService {
     }
 
     @Transactional(readOnly = true)
-    public OrderProducts readOrderProducts(Long id)throws OrderProductsNotExistsException{
+    public OrderProductsDTO readOrderProducts(Long id)throws OrderProductsNotExistsException{
         if(!repo.existsById(id))
             throw new OrderProductsNotExistsException();
-        return repo.findById(id).get();
+        OrderProducts op=repo.findById(id).get();
+        return new OrderProductsDTO(op);
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -76,18 +81,15 @@ public class OrderProductService {
 
 
     @Transactional(readOnly = true)
-    public List<OrderProducts> showByOrder(Long id) throws OrderNotExistsException {
+    public List<OrderProductsDTO> showByOrder(Long id) throws OrderNotExistsException {
         if(!orepo.existsById(id))
             throw new OrderNotExistsException();
         Order o = orepo.findById(id).get();
-        return repo.findByOrder(o);
-    }
-
-    @Transactional(readOnly = true)
-    public List<OrderProducts> showByProduct(String barcode) throws ProductNotExistsException {
-        if(!prepo.existsByBarCode(barcode))
-            throw new ProductNotExistsException();
-        Product p = prepo.findByBarCode(barcode).get();
-        return repo.findByProduct(p);
+        List<OrderProducts> l=repo.findByOrder(o);
+        List<OrderProductsDTO> ret= new ArrayList<>();
+        for(OrderProducts op: l){
+            ret.add(new OrderProductsDTO(op));
+        }
+        return ret;
     }
 }

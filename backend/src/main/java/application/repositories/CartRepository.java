@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface CartRepository extends JpaRepository<Cart,Long> {
 
-    @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
+    @Lock(LockModeType.OPTIMISTIC)
     Optional<Cart> findByUser(Utente utente);
     boolean existsByUser(Utente utente);
 }

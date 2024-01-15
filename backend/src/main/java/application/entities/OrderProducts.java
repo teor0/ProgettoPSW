@@ -1,6 +1,7 @@
 package application.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -15,12 +16,13 @@ public class OrderProducts {
     @Column(name = "id", nullable = false)
     private Long id;
 
+
     @ManyToOne(fetch = EAGER, optional = false)
     @JoinColumn(name = "order_id")
-    @JsonBackReference(value = "orderproducts")
+    @JsonBackReference(value = "orderProducts")
     private Order order;
 
-    //forse devo usare la json managedreference
+
     @ManyToOne(fetch = EAGER, optional = false)
     @JoinColumn(name = "product_id")
     @JsonBackReference(value = "product")

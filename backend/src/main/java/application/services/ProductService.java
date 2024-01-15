@@ -7,14 +7,12 @@ import application.repositories.OrderProductRepository;
 import application.repositories.OrderRepository;
 import application.repositories.ProductRepository;
 import application.support.dto.ProductDTO;
-import application.support.exceptions.OrderNotExistsException;
-import application.support.exceptions.ProductAlreadyExistsException;
-import application.support.exceptions.ProductNotExistsException;
-import application.support.exceptions.UncorrectPriceException;
+import application.support.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
@@ -46,6 +44,13 @@ public class ProductService {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Optional<Product> getProduct(Long id) throws ProductNotExistsException {
+        if(!prrepo.existsById(id))
+            throw new ProductNotExistsException();
+        return prrepo.findById(id);
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void updateProductName(ProductDTO dto) throws ProductNotExistsException{
         if(!prrepo.existsById(dto.getId()))
             throw new ProductNotExistsException();
@@ -69,7 +74,7 @@ public class ProductService {
         oldProduct.setCategory(dto.getCategory());
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
     public void updatePrice(ProductDTO dto) throws ProductNotExistsException, OrderNotExistsException {
         if(!prrepo.existsById(dto.getId()))
             throw new ProductNotExistsException();
@@ -107,16 +112,6 @@ public class ProductService {
     @Transactional(readOnly = true)
     public List<Product> showAllProducts(){
         return prrepo.findAll();
-    }
-
-    @Transactional(readOnly = true)
-    public List<Product> showAllProducts(int pageNumber, int size, String sortBy){
-        Pageable paging = PageRequest.of(pageNumber, size, Sort.by(sortBy));
-        Page<Product> pagedResult= prrepo.findAll(paging);
-        if(pagedResult.hasContent())
-            return pagedResult.getContent();
-        else
-            return new ArrayList<>();
     }
 
     @Transactional(readOnly = true)

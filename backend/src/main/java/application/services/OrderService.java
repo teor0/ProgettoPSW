@@ -14,7 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import application.repositories.UtenteRepository;
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -28,7 +29,7 @@ public class OrderService{
     private UtenteRepository urepo;
 
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional
     public void addOrder(Order o) throws OrderAlreadyExistsException, UtenteNotExistsException {
         if(repo.existsById(o.getId()))
             throw new OrderAlreadyExistsException();
@@ -51,31 +52,17 @@ public class OrderService{
         repo.delete(o);
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void updateOrder(OrderDTO dto) throws OrderNotExistsException {
-        if(!repo.existsById(dto.getId()))
-            throw new OrderNotExistsException();
-        Order o = repo.findById(dto.getId()).get();
-        o.setTotal(dto.getTotal());
-        o.setCreateDate(dto.getCreateDate());
-    }
-
     @Transactional(readOnly = true)
-    public List<Order> showByDate(LocalDate d1, LocalDate d2){
-       return repo.findByCreateDateBetween(d1,d2);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Order> showByStatus(String status){
-        return repo.findByStatus(status);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Order> showByUserAndStatus(Long id,String status) throws UtenteNotExistsException {
+    public List<OrderDTO> showByUserAndStatus(Long id,String status) throws UtenteNotExistsException {
         if(!urepo.existsById(id))
             throw new UtenteNotExistsException();
         Utente u = urepo.findById(id).get();
-        return repo.findByUserAndStatus(u,status);
+        List<Order> l = repo.findByUserAndStatus(u,status);
+        List<OrderDTO> ret= new ArrayList<>();
+        for(Order o: l){
+            ret.add(new OrderDTO(o));
+        }
+        return ret;
     }
 
     @Transactional(readOnly = true)

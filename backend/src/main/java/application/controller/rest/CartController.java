@@ -1,92 +1,110 @@
 package application.controller.rest;
 
-import application.entities.Cart;
 import application.services.CartService;
+import application.support.dto.CartDTO;
 import application.support.dto.OrderDTO;
 import application.support.dto.UtenteDTO;
 import application.support.exceptions.*;
 import jakarta.validation.Valid;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins = {"https://localhost:4200"})
 @RequestMapping("/cart")
+@PreAuthorize(value="hasRole('ROLE_User')")
 public class CartController {
 
     @Autowired
     private CartService cartService;
 
-    @GetMapping("/show/{user}")
-    public ResponseEntity readCart(@PathVariable(value = "user") Long id){
-        Cart c;
-        try{
-            c=cartService.getCart(id);
-        }
-        catch(UtenteNotExistsException e){
-            return new ResponseEntity<>("User not found!", HttpStatus.BAD_REQUEST);
-        }
-        catch(CartNotExistsException ex) {
-            return new ResponseEntity<>("Cart not found!", HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(c,HttpStatus.OK);
-    }
-
-    @PostMapping("/acquire")
-    public ResponseEntity acquireCart(@Valid @RequestBody UtenteDTO dto){
-        try {
-            cartService.acquire(dto);
-        } catch (UtenteNotExistsException e) {
-            return new ResponseEntity<>("User not found!", HttpStatus.BAD_REQUEST);
-        } catch (OrderNotExistsException e) {
-            return new ResponseEntity<>("Order not exists!", HttpStatus.BAD_REQUEST);
-        } catch (QtaUnvaliableException e) {
-            return new ResponseEntity<>("The product quantity no longer available!", HttpStatus.BAD_REQUEST);
-        } catch (PriceChangedException e) {
-            return new ResponseEntity<>("Price of the product changed!", HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>("Success", HttpStatus.OK);
-    }
-
-
-    @PostMapping()
-    public ResponseEntity createCart(@Valid @RequestBody UtenteDTO dto){
+    @PostMapping
+    public ResponseEntity<JSONObject> createCart(@Valid @RequestBody UtenteDTO dto){
+        JSONObject response= new JSONObject();
         try {
             cartService.createCart(dto);
         } catch (CartAlreadyExistsException e) {
-            return new ResponseEntity<>("Cart already exists!", HttpStatus.BAD_REQUEST);
+            response.put("msg","Cart already exists!");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (UtenteNotExistsException e) {
-            return new ResponseEntity<>("User not found!", HttpStatus.BAD_REQUEST);
+            response.put("msg","User not found!");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>("Cart created!", HttpStatus.OK);
+        response.put("msg","Cart created!");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PutMapping("/checkout")
+    @PutMapping("/refresh")
     public ResponseEntity updateCart(@Valid @RequestBody OrderDTO dto){
-        Cart c;
+        CartDTO c;
+        JSONObject response= new JSONObject();
         try {
             c=cartService.setCart(dto);
         } catch (UtenteNotExistsException e) {
-            return new ResponseEntity<>("User not found!", HttpStatus.BAD_REQUEST);
+            response.put("msg","User not found!");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (OrderNotExistsException e) {
-            return new ResponseEntity<>("Order not found!", HttpStatus.BAD_REQUEST);
+            response.put("msg","Order not found!");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(c, HttpStatus.OK);
     }
 
+
+    @GetMapping("/show/{user}")
+    public @ResponseBody CartDTO readCart(@PathVariable(value = "user") Long id){
+        CartDTO c;
+        try{
+            c=cartService.getCart(id);
+        }
+        catch(UtenteNotExistsException | CartNotExistsException e){
+            return new CartDTO();
+        }
+        return c;
+    }
+
+    @PostMapping("/checkout")
+    public ResponseEntity<JSONObject> acquireCart(@Valid @RequestBody UtenteDTO dto){
+        JSONObject response= new JSONObject();
+        try {
+            cartService.acquire(dto);
+        } catch (UtenteNotExistsException e) {
+            response.put("msg","User not found!");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (OrderNotExistsException e) {
+            response.put("msg","Order not exists!");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (QtaUnvaliableException e) {
+            response.put("msg","The product quantity no longer available!");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (PriceChangedException e) {
+            response.put("msg","Price of the product changed!");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+        response.put("msg","Acquire done!");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @DeleteMapping("/delete/{user}")
     public ResponseEntity deleteCart(@PathVariable(value = "user") Long id){
-        Cart c;
+        CartDTO c;
+        JSONObject response= new JSONObject();
         try{
             c=cartService.clearCart(id);
         }
         catch (OrderNotExistsException e) {
-            return new ResponseEntity<>("Order not found!", HttpStatus.BAD_REQUEST);
+            response.put("msg","Order not found!");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (CartNotExistsException e) {
-            return new ResponseEntity<>("Cart not found!", HttpStatus.BAD_REQUEST);
+            response.put("msg","Cart not found!");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (UtenteNotExistsException e) {
-            return new ResponseEntity<>("User not found!", HttpStatus.BAD_REQUEST);
+            response.put("msg","User not found!");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(c, HttpStatus.OK);
     }

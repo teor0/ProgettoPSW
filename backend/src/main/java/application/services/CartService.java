@@ -2,6 +2,7 @@ package application.services;
 
 import application.entities.*;
 import application.repositories.*;
+import application.support.dto.CartDTO;
 import application.support.dto.OrderDTO;
 import application.support.dto.UtenteDTO;
 import application.support.exceptions.*;
@@ -9,6 +10,7 @@ import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -22,6 +24,9 @@ public class CartService {
     private OrderRepository orepo;
     @Autowired
     private ProductRepository prepo;
+    @Autowired
+    private OrderService orderService;
+
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void createCart(UtenteDTO dto) throws UtenteNotExistsException, CartAlreadyExistsException {
@@ -36,44 +41,48 @@ public class CartService {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Cart clearCart(Long userId) throws UtenteNotExistsException, CartNotExistsException, OrderNotExistsException {
+    public CartDTO setCart(OrderDTO dto) throws OrderNotExistsException, UtenteNotExistsException {
+        if(!orepo.existsById(dto.getId()))
+            throw new OrderNotExistsException();
+        Order o = orepo.findById(dto.getId()).get();
+        if(!urepo.existsById(dto.getUserId()))
+            throw new UtenteNotExistsException();
+        Utente u = urepo.findById(dto.getUserId()).get();
+        Cart c= repo.findByUser(u).get();
+        c.setOrder(o);
+        return new CartDTO(c);
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public CartDTO clearCart(Long userId) throws UtenteNotExistsException, CartNotExistsException, OrderNotExistsException {
         if(!urepo.existsById(userId))
             throw new UtenteNotExistsException();
         Utente u = urepo.findById(userId).get();
         if(!repo.existsByUser(u))
             throw new CartNotExistsException();
         Cart c = repo.findByUser(u).get();
+        if(c.getOrder()==null){
+            throw new OrderNotExistsException();
+        }
         if(!orepo.existsById(c.getOrder().getId()))
             throw new OrderNotExistsException();
+        orderService.deleteOrder(c.getOrder().getId());
         c.setOrder(null);
         repo.flush();
-        return repo.findByUser(u).get();
+        return new CartDTO(c);
     }
 
     @Transactional(readOnly = true)
-    public Cart getCart(Long id) throws UtenteNotExistsException, CartNotExistsException{
+    public CartDTO getCart(Long id) throws UtenteNotExistsException, CartNotExistsException{
         if(!urepo.existsById(id))
             throw new UtenteNotExistsException();
         Utente u = urepo.findById(id).get();
         if(!repo.existsByUser(u))
             throw new CartNotExistsException();
-        return repo.findByUser(u).get();
+        return new CartDTO(repo.findByUser(u).get());
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Cart setCart(OrderDTO dto) throws OrderNotExistsException, UtenteNotExistsException {
-        if(!orepo.existsById(dto.getId()))
-            throw new OrderNotExistsException();
-        Order o = orepo.findById(dto.getId()).get();
-        if(!urepo.existsById(dto.getUser()))
-            throw new UtenteNotExistsException();
-        Utente u = urepo.findById(dto.getUser()).get();
-        Cart c= repo.findByUser(u).get();
-        c.setOrder(o);
-        return c;
-    }
-
-    @Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = {UtenteNotExistsException.class, QtaUnvaliableException.class, PriceChangedException.class})
+    @Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = {UtenteNotExistsException.class, QtaUnvaliableException.class, PriceChangedException.class}, propagation = Propagation.REQUIRED)
     public void acquire(UtenteDTO dto) throws QtaUnvaliableException, PriceChangedException, OrderNotExistsException, UtenteNotExistsException {
         if(!urepo.existsById(dto.getId()))
             throw new UtenteNotExistsException();
@@ -92,7 +101,7 @@ public class CartService {
             p.setQuantity(p.getQuantity()- item.getQuantity());
             prepo.save(p);
         }
-        //pagamento...
+        //payment...
         o.setStatus("Handled");
         c.setOrder(null);
         repo.save(c);

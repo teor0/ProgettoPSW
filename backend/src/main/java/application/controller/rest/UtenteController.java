@@ -2,83 +2,93 @@ package application.controller.rest;
 
 import application.entities.Utente;
 import application.services.UtenteService;
-import application.support.exceptions.MailAlreadyExistsException;
+import application.support.exceptions.AuthenticationException;
 import application.support.exceptions.UtenteNotExistsException;
-import jakarta.validation.Valid;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
 
 @RestController
+@CrossOrigin(origins = {"https://localhost:4200"})
 @RequestMapping("/user")
 public class UtenteController {
 
     @Autowired
     private UtenteService utenteService;
 
-    @PostMapping("")
-    public ResponseEntity create(@Valid @RequestBody Utente u){
-        try{
-            utenteService.addUtente(u);
-        }
-        catch (MailAlreadyExistsException e) {
-            return new ResponseEntity<>("Errore mail già in uso", HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>("Registrazione con successo", HttpStatus.OK);
+    @PreAuthorize(value="hasRole('ROLE_User')")
+    @GetMapping(value="/search/{id}")
+    public @ResponseBody Optional<Utente> readById(@PathVariable(value = "id") Long id) throws UtenteNotExistsException {
+        return utenteService.getUtente(id);
     }
 
-    @GetMapping("/{id}")
-    public @ResponseBody Utente read(@PathVariable(value = "id") Long id){
-        Utente u=null;
-        try{
-            u=utenteService.getUtente(id);
-        }
-        catch(UtenteNotExistsException e){
-            return u;
-        }
-        return u;
+    @PreAuthorize(value="hasRole('ROLE_Admin')")
+    @GetMapping(value="/search", params = "name")
+    public @ResponseBody List<Utente> readByName(@RequestParam(value = "name") String name){
+        return utenteService.getUtentiByName(name);
     }
 
-    @GetMapping("/{name}")
-    public @ResponseBody List<Utente> readByName(@PathVariable(value = "name") String name){
-        return utenteService.getUtenteByName(name);
-    }
-
-    @GetMapping("/{email}")
-    public @ResponseBody Optional<Utente> readByEmail(@PathVariable(value = "email") String email){
+    @PreAuthorize(value="hasRole('ROLE_Admin')")
+    @GetMapping(value="/search",params ="email")
+    public @ResponseBody Optional<Utente> readByEmail(@RequestParam(value = "email") String email){
         return utenteService.getUtenteByEmail(email);
     }
 
-    @GetMapping("/all")
-    public ResponseEntity readAll(){
-        return new ResponseEntity(utenteService.getUtenti(),HttpStatus.OK);
+    @PreAuthorize(value="hasRole('ROLE_User')")
+    @GetMapping(value="/{username}")
+    public @ResponseBody Optional<Utente> readByUsername(@PathVariable(value = "username") String username){
+        return utenteService.getUtenteByUsername(username);
     }
 
-    @GetMapping("/orders")
+    @PreAuthorize(value="hasRole('ROLE_Admin')")
+    @GetMapping(value="/search", params = "username")
+    public @ResponseBody List<Utente> readAllByUsername(@RequestParam String username){
+        return utenteService.getUtentiByUsername(username);
+    }
+
+    @PreAuthorize(value="hasRole('ROLE_Admin')")
+    @GetMapping("/all")
+    public @ResponseBody List<Utente> readAll(){
+        return utenteService.getUtenti();
+    }
+
+    @PreAuthorize(value="hasRole('ROLE_User')")
+    @GetMapping(value="/orders")
     public ResponseEntity readOrders(@RequestParam(value= "id") Long id){
-        Utente u=null;
+        Utente u;
         try{
-            u=utenteService.getUtente(id);
+            u=utenteService.getUtente(id).get();
         }
         catch(UtenteNotExistsException e){
-            return new ResponseEntity("Errore nessun utente",HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("Error no order found!",HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(u.getOrders(),HttpStatus.OK);
     }
 
+    @PreAuthorize(value="hasRole('ROLE_Admin')")
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable(value= "id") Long id ){
+    public ResponseEntity<JSONObject> delete(@PathVariable(value= "id") Long id ){
+        JSONObject response= new JSONObject();
         try {
             utenteService.delete(id);
         }
         catch(UtenteNotExistsException e){
-            return new ResponseEntity<>("Utente non esistente", HttpStatus.BAD_REQUEST);
+            response.put("msg","User doesn't exists!");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>("Cancellazione effettuata con successo", HttpStatus.OK);
+        catch(AuthenticationException e){
+            response.put("msg","Error during delete process");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+        response.put("msg","User deleted");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 

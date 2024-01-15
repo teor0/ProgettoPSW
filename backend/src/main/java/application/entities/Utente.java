@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -22,7 +23,13 @@ public class Utente {
     private Long id;
 
     @Basic
-    @Size(max = 30)
+    @Size(max=15)
+    @NotNull
+    @Column(name = "username")
+    private String username;
+
+    @Basic
+    @Size(max = 50)
     @NotNull
     @Column(name = "name")
     private String name;
@@ -33,6 +40,17 @@ public class Utente {
     @Column(name = "email")
     private String email;
 
+    @Basic
+    @Size(max=30)
+    @NotBlank
+    @Column(name = "password")
+    private String password;
+
+    @Basic
+    @Size
+    @Column(name = "role")
+    private String role;
+
     @ToString.Exclude
     @OneToMany(fetch = LAZY,mappedBy = "user",cascade = {CascadeType.MERGE}, orphanRemoval = true)
     @JsonManagedReference(value = "user-orders")
@@ -41,7 +59,7 @@ public class Utente {
 
     @ToString.Exclude
     @JsonBackReference(value = "user")
-    @OneToOne(mappedBy = "user",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
     private Cart cart;
 
 }

@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-
 import static jakarta.persistence.FetchType.EAGER;
 import java.util.*;
 
@@ -24,7 +23,6 @@ public class Order {
 
     @ManyToOne(fetch = EAGER)
     @JoinColumn(name = "user_id")
-    //annotazione che forse con il front end non servira
     @JsonBackReference(value = "user-orders")
     private Utente user;
 
@@ -45,13 +43,12 @@ public class Order {
 
     @ToString.Exclude
     @OneToMany(fetch = EAGER,mappedBy = "order",cascade = {CascadeType.REMOVE,CascadeType.MERGE}, orphanRemoval = true)
-    @JsonManagedReference(value = "orderproducts")
+    @JsonManagedReference(value = "orderProducts")
     private List<OrderProducts> orderProducts;
 
-    @ToString.Exclude
-    @OneToOne(mappedBy = "order")
-    @JsonBackReference(value = "cart")
-    @JsonIgnore
+    @JsonBackReference(value = "order")
+    @OneToOne(mappedBy = "order",  cascade = {CascadeType.REMOVE})
     private Cart cart;
+
 
 }

@@ -1,20 +1,17 @@
-keycloak:
-  resource: TestClient
-
 spring:
   application:
     name: progettopsw
   datasource:
-    username: 'postgres'
-    password: 'admin'
+    username: ''
+    password: ''
     url: jdbc:postgresql://localhost:5432/postgres
     driver-class-name: org.postgresql.Driver
   security:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://localhost:8081/auth/realms/TestClient/protocol/openid-connect/certs
-          issuer-uri: http://localhost:8081/auth/realms/TestClient
+          jwk-set-uri: http://localhost:8081/realms//protocol/openid-connect/certs
+          issuer-uri: http://localhost:8081/realms/
 
 
   jpa:
@@ -30,7 +27,11 @@ spring:
 server:
   compression:
     enabled: 'true'
-  port: 8080
+  port: 8082
+  ssl:
+    key-store-password: 
+    key-store-type: PKCS12
+    key-store: classpath:ssl/project.p12
   error:
     include-message: always
 

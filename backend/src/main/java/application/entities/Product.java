@@ -1,7 +1,6 @@
 package application.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -57,8 +56,9 @@ public class Product {
     @Column(name = "version", nullable = false)
     private Long version;
 
-    //visto che non è l'owner cascade forse va tolto il cascade e cambiato il json reference
+
     @ToString.Exclude
+    @JsonIgnore
     @OneToMany(fetch = LAZY,mappedBy = "product",cascade = {CascadeType.MERGE,CascadeType.REMOVE,CascadeType.REFRESH}, orphanRemoval = true)
     @JsonManagedReference(value = "product")
     private List<OrderProducts> orderProducts;
