@@ -1,0 +1,55 @@
+<button mat-raised-button [matMenuTriggerFor]="menu">Product Action Menu<mat-icon>menu</mat-icon></button>
+<mat-menu #menu="matMenu">
+  <button mat-button (click)="getOrderProducts()">Show products in order</button>
+</mat-menu>
+<div class="order-product tab" align="center">
+<mat-table #table [dataSource]="dataSource" matSort *ngIf="!hideRecap">
+    <ng-container matColumnDef="orderProductId">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef> ID Order product </th>
+      <td mat-cell *matCellDef="let op"> {{op.id}} </td>
+    </ng-container>
+    <ng-container matColumnDef="productId">
+      <th mat-header-cell *matHeaderCellDef> Product ID </th>
+      <td mat-cell *matCellDef="let op"> {{op.productId}} </td>
+    </ng-container>
+    <ng-container matColumnDef="quantity">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef> Quantity </th>
+      <td mat-cell *matCellDef="let op"> {{op.quantity}} </td>
+    </ng-container>
+    <ng-container matColumnDef="price">
+      <th mat-header-cell *matHeaderCellDef> Price </th>
+      <td mat-cell *matCellDef="let op"> {{op.price}} </td>
+    </ng-container>
+    <ng-container matColumnDef="action">
+      <th mat-header-cell *matHeaderCellDef> Action </th>
+      <td mat-cell *matCellDef="let op">
+        <button mat-raised-button (click)="delete(op.id)">Delete</button>
+        <button mat-raised-button (click)="showInfo(op.productId)">More info</button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</mat-table>
+<mat-paginator [pageSizeOptions]="[5, 10, 20]"
+  showFirstLastButtons *ngIf="!hideRecap"
+  aria-label="Select page of orders">
+</mat-paginator>
+<button mat-raised-button (click)="showRecap()" *ngIf="!hideRecap">Hide table</button>
+<mat-divider></mat-divider>
+</div>
+<div class="product-details" align="center">
+<mat-card class="card-product" *ngIf="!hideMoreInfo">
+  <mat-card-header>
+  <mat-card-title>Product information</mat-card-title>
+  </mat-card-header>
+  <mat-card-content >
+    <p *ngFor="let property of productToShow | keyvalue">
+      {{property.key}}: {{property.value}};
+    </p>
+  </mat-card-content>
+  <mat-card-actions align="end">
+    <button mat-raised-button (click)="showMoreInfo()">Collapse result</button>
+  </mat-card-actions>
+</mat-card>
+</div>
+<br>

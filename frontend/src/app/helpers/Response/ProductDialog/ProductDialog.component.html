@@ -1,0 +1,13 @@
+<h1 mat-dialog-title>{{title}}</h1>
+<div mat-dialog-content>
+  <br>
+  <mat-form-field>
+    <mat-label>Value</mat-label>
+    <input matInput type="number" [(ngModel)]="value">
+  </mat-form-field>
+  <div mat-dialog-actions>
+  <button mat-button mat-dialog-close>Undo</button>
+  <button mat-button mat-dialog-close (click)="addTocart(productToAdd,value)">Confirm</button>
+  </div>
+</div>
+

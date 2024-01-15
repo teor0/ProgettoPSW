@@ -1,0 +1,7 @@
+<h1>Order board</h1>
+<mat-divider></mat-divider>
+<br>
+<button mat-raised-button (click)="newOrder()" [disabled]="hasPending">Create new order</button>
+<app-ShowOrder [user]="user" ></app-ShowOrder>
+<app-ShowOrderProducts></app-ShowOrderProducts>
+

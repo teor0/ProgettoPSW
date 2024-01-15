@@ -1,0 +1,59 @@
+<button mat-raised-button [matMenuTriggerFor]="menu">User action Menu<mat-icon>menu</mat-icon></button>
+<mat-menu #menu="matMenu">
+  <button mat-menu-item (click)="showSearchUser()">Search a user</button>
+</mat-menu>
+<div class="search-user" *ngIf="!hideSearchUser">
+  <form [formGroup]="search" align="center">
+    <mat-form-field>
+      <mat-label>Search input here</mat-label>
+      <input matInput placeholder="Something" formControlName="searchControl">
+    </mat-form-field>
+  </form>
+  <div class="button-container" align="center">
+  <button mat-raised-button (click)="searchByName()">Name<mat-icon fontIcon="search">
+  </mat-icon>Search</button>
+  <button mat-raised-button (click)="searchByUsername()">Username<mat-icon fontIcon="search">
+  </mat-icon>Search</button>
+  <button mat-raised-button (click)="searchByEmail()">Email<mat-icon fontIcon="search">
+  </mat-icon>Search</button>
+  <br>
+  <br>
+  <button mat-raised-button (click)="showSearchUser()">Hide form</button>
+  </div>
+</div>
+<br/>
+<br>
+  <mat-card class="card-user" *ngIf="userToDisplay">
+    <mat-card-header>
+      <mat-card-title>User information</mat-card-title>
+    </mat-card-header>
+    <mat-divider></mat-divider>
+    <mat-card-content align="center">
+      <p *ngFor="let property of userToDisplay | keyvalue">
+        {{property.key}}: {{property.value}};
+      </p>
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <button mat-raised-button (click)="userToDisplay=undefined">Collapse result</button>
+    </mat-card-actions>
+    </mat-card>
+    <mat-divider></mat-divider>
+    <br>
+<div *ngFor="let user of users">
+  <mat-card class="card-user" *ngIf="users">
+    <mat-card-header>
+      <mat-card-title>User information</mat-card-title>
+    </mat-card-header>
+    <mat-divider></mat-divider>
+    <mat-card-content align="center">
+      <p *ngFor="let property of user | keyvalue">
+        {{property.key}}: {{property.value}};
+      </p>
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <button mat-raised-button (click)="users=[]">Collapse result</button>
+    </mat-card-actions>
+    </mat-card>
+    <mat-divider></mat-divider>
+    <br>
+</div>

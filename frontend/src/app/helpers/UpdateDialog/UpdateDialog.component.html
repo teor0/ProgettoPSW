@@ -1,0 +1,10 @@
+<h1 mat-dialog-title>{{title}}</h1>
+<div mat-dialog-content>
+  <input matInput [formControl]="updateForm"
+           placeholder="Put what you need to update">
+  <br>
+  <div mat-dialog-actions>
+  <button mat-button mat-dialog-close>Undo</button>
+  <button mat-button mat-dialog-close (click)="update(productToUpdate,propertyToUpdate,updateForm.value)">Confirm</button>
+  </div>
+</div>

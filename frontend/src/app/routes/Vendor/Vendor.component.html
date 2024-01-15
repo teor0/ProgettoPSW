@@ -1,0 +1,158 @@
+<h2>Vendor section</h2>
+<mat-divider></mat-divider>
+<button mat-raised-button [matMenuTriggerFor]="menu">Vendor action Menu<mat-icon>menu</mat-icon></button>
+<mat-menu #menu="matMenu">
+  <button mat-menu-item (click)="showFormCreate()">Create a product</button>
+  <button mat-menu-item (click)="showSearch()">Search product</button>
+  <button mat-menu-item (click)="showPriceButtons()">Search product by price</button>
+</mat-menu>
+<br>
+<br>
+<div class="form-container" *ngIf="!hideForm" align="center">
+  <form [formGroup]="productForm">
+    <mat-form-field>
+      <mat-label>Enter product barcode</mat-label>
+      <input matInput placeholder="0XM2L91NV" formControlName="barCode" required>
+    </mat-form-field>
+    <br>
+    <mat-form-field>
+      <mat-label>Enter product name</mat-label>
+      <input matInput placeholder="Name" formControlName="name" required>
+    </mat-form-field>
+    <br/>
+    <mat-form-field>
+      <mat-label>Enter product category</mat-label>
+      <input matInput placeholder="Category" formControlName="category" required>
+    </mat-form-field>
+    <br/>
+    <mat-form-field>
+      <mat-label>Enter product price</mat-label>
+      <input matInput placeholder="9.99" formControlName="price">
+      <span matTextSuffix>€&nbsp;</span>
+    </mat-form-field>
+    <br/>
+    <mat-form-field>
+      <mat-label>Enter product description</mat-label>
+      <input matInput placeholder="Description" formControlName="description">
+    </mat-form-field>
+    <br/>
+    <mat-form-field>
+      <mat-label>Enter product quantity</mat-label>
+      <input matInput placeholder="Quantity" formControlName="quantity" required>
+    </mat-form-field>
+  </form>
+  <button mat-raised-button (click)="createProduct()">Create Product</button>
+  <button mat-raised-button (click)="showFormCreate()">Hide form</button>
+</div>
+<div class="searchContainer" *ngIf="!hideSearch" align="center">
+  <form [formGroup]="searchForm" *ngIf="!hideButtons">
+    <mat-form-field>
+      <mat-label>Search product</mat-label>
+      <input matInput placeholder="Anything" formControlName="searchingForm">
+    </mat-form-field>
+  </form>
+  <form [formGroup]="searchBetweenForm" *ngIf="!hidePriceButtons">
+    <mat-form-field>
+      <mat-label>Price to compare</mat-label>
+      <input matInput formControlName="priceForm">
+    </mat-form-field>
+    <br>
+    <mat-form-field>
+      <mat-label>Minimum price</mat-label>
+      <input matInput formControlName="minForm">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Maximum price</mat-label>
+      <input matInput formControlName="maxForm">
+    </mat-form-field>
+  </form>
+  <div class="buttons" align="center">
+    <div class="normal-buttons" *ngIf="!hideButtons">
+      <button mat-raised-button (click)="searchByBarcode()" ><mat-icon fontIcon="search">
+      </mat-icon>Search barcode</button>
+      <button mat-raised-button (click)="searchByName()" ><mat-icon fontIcon="search">
+      </mat-icon>Search by name</button>
+      <button mat-raised-button (click)="searchByCat()" ><mat-icon fontIcon="search">
+      </mat-icon>Search by category</button>
+    </div>
+    <div class="search-price-buttons" *ngIf="!hidePriceButtons">
+      <button mat-raised-button (click)="searchByPriceLE()" ><mat-icon fontIcon="search">
+      </mat-icon>Search by price less equal</button>
+      <button mat-raised-button (click)="searchByPriceGE()" ><mat-icon fontIcon="search">
+      </mat-icon>Search by price greater equal</button>
+      <button mat-raised-button (click)="searchByPriceBetween()" ><mat-icon fontIcon="search">
+      </mat-icon>Search by price between</button>
+    </div>
+  </div>
+  <br/>
+  <br>
+  <mat-table #table [dataSource]="dataSourceSearch" matSort *ngIf="!hideTab">
+    <ng-container matColumnDef="id">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef> Id </th>
+      <td mat-cell *matCellDef="let pr"> {{pr.id}} </td>
+    </ng-container>
+    <ng-container matColumnDef="barCode">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef> Barcode </th>
+      <td mat-cell *matCellDef="let pr"> {{pr.barCode}} </td>
+    </ng-container>
+    <ng-container matColumnDef="name">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell *matCellDef="let pr"> {{pr.name}} </td>
+    </ng-container>
+    <ng-container matColumnDef="category">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef> Category </th>
+      <td mat-cell *matCellDef="let pr"> {{pr.category}} </td>
+    </ng-container>
+    <ng-container matColumnDef="price">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef> Price </th>
+      <td mat-cell *matCellDef="let pr"> {{pr.price}}€ </td>
+    </ng-container>
+    <ng-container matColumnDef="description">
+      <th mat-header-cell *matHeaderCellDef> Description </th>
+      <td mat-cell *matCellDef="let pr"> {{pr.description}} </td>
+    </ng-container>
+    <ng-container matColumnDef="quantity">
+      <th mat-sort-header mat-header-cell *matHeaderCellDef> Quantity </th>
+      <td mat-cell *matCellDef="let pr"> {{pr.quantity}} </td>
+    </ng-container>
+    <ng-container matColumnDef="action" class="action-class">
+      <th mat-header-cell *matHeaderCellDef> Action </th>
+      <td mat-cell *matCellDef="let pr" align="center">
+        <button mat-raised-button [matMenuTriggerFor]="menu">Action Menu<mat-icon>menu</mat-icon></button>
+        <mat-menu #menu="matMenu">
+        <button mat-raised-button (click)="delete(pr.id)"> <mat-icon>delete_forever</mat-icon>Delete</button>
+        <button mat-raised-button (click)="updateBarcode(pr)"> <mat-icon>update</mat-icon> Barcode</button>
+        <button mat-raised-button (click)="updateName(pr)"> <mat-icon>update</mat-icon>Name</button>
+        <button mat-raised-button (click)="updateCategory(pr)"> <mat-icon>update</mat-icon>Category</button>
+        <button mat-raised-button (click)="updatePrice(pr)"> <mat-icon>update</mat-icon>Price</button>
+        <button mat-raised-button (click)="updateDescription(pr)"> <mat-icon>update</mat-icon>Description</button>
+        <button mat-raised-button (click)="updateQuantity(pr)"> <mat-icon>update</mat-icon>Quantity</button>
+        </mat-menu>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </mat-table>
+  <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+  showFirstLastButtons *ngIf="!hideTab"
+  aria-label="Select page of products">
+  </mat-paginator>
+  <button mat-raised-button (click)="hideTable()" *ngIf="!hideTab">Hide table</button>
+  <mat-card class="card-product" *ngIf="searchResult">
+    <mat-card-header>
+      <mat-card-title>Product information</mat-card-title>
+    </mat-card-header>
+    <mat-divider></mat-divider>
+    <mat-card-content>
+      <p *ngFor="let property of searchResult | keyvalue">
+        {{property.key}}: {{property.value}};
+      </p>
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <button mat-icon-button (click)="delete(searchResult.id)"> <mat-icon>delete_forever</mat-icon></button>
+    </mat-card-actions>
+  </mat-card>
+  <button mat-raised-button (click)="hideSearchForm()">Hide form</button>
+  <br>
+  <mat-divider></mat-divider>
+</div>
