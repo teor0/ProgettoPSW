@@ -22,8 +22,8 @@ export class CartComponent implements OnInit{
   }
 
   ngOnInit() {
-    this.refreshCart();
     this.retrieveOrder();
+    this.refreshCart();
   }
 
   acquire(){

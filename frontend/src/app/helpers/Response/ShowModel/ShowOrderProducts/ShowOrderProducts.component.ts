@@ -75,17 +75,15 @@ export class ShowOrderProductsComponent{
     }
   }
 
-  showRecap(){
-    this.hideRecap=!this.hideRecap;
-  }
-
-  showMoreInfo(){
-    this.hideMoreInfo=!this.hideMoreInfo;
-  }
-
-
   delete(id:number){
     this.orderProductsService.deleteOP(id,this.successDelete.bind(this));
+  }
+
+  private successDelete(status:boolean,response:any){
+    if(status){
+      this.responseService.openDialogOk(response);
+      this.getOrderProducts();
+    }
   }
 
   showInfo(id:number){
@@ -100,9 +98,21 @@ export class ShowOrderProductsComponent{
     }
   }
 
-  private successDelete(status:boolean,response:any){
-    if(status)
-      this.responseService.openDialogOk(response);
+
+  showRecap(){
+    this.hideRecap=!this.hideRecap;
+  }
+
+  showMoreInfo(){
+    this.hideMoreInfo=!this.hideMoreInfo;
+  }
+
+  getTotal(): number{
+    var tot=0.0;
+    for(let op of this.orderProducts){
+      tot+=op.price*op.quantity;
+    }
+    return tot;
   }
 
 }

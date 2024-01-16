@@ -1,10 +1,10 @@
 //utility
 
 //authentication
-export const REALM ="";
-export const ID_CLIENT="";
-export const CLIENT_SECRET =";
-export const CLIENT_ID ="";
+export const REALM ="ProjectRealm";
+export const ID_CLIENT="90d4e5dc-b9ef-4311-b263-c0de6f93cb89";
+export const CLIENT_SECRET ="CDq6yNvEQZyKoTtTUgizCqNaYknacEK7";
+export const CLIENT_ID ="Project";
 
 //addresses
 export const ADDRESS_SERVER = "https://localhost:8082";

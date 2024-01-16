@@ -75,7 +75,7 @@ export class UserService {
   }
 
   logout(user: User){
-    this.authService.logout(user.username,user.password,this.logoutSuccess.bind(this));
+    this.authService.logout(this.logoutSuccess.bind(this));
   }
 
   private registerSuccess(user: User, status: boolean, response : any){
