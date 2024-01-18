@@ -22,8 +22,7 @@ export class UpdateDialogComponent{
                   propertyToUpdate: keyof ProductImpl;
               },private dialogRef: MatDialogRef<UpdateDialogComponent>,
                 private productService:ProductService, private responseService:ResponseService){
-                  if (data.productToUpdate)
-                    this.productToUpdate = data.productToUpdate;
+                  this.productToUpdate = data.productToUpdate;
                   this.propertyToUpdate=data.propertyToUpdate;
                   this.updateForm= new FormControl('')
   }
@@ -35,9 +34,9 @@ export class UpdateDialogComponent{
     this.productService.update(this.updateSuccess.bind(this),updatedProduct,fieldToUpdate);
   }
 
-  private updateSuccess(status:boolean){
+  private updateSuccess(status:boolean, response:any){
     if(status)
-      this.responseService.openDialogNoMsg();
+      this.responseService.openDialogOk(response);
   }
 
   closeDialog() {

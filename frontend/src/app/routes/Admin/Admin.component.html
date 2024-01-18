@@ -1,3 +1,4 @@
+<div align="center">
 <mat-table #table [dataSource]="dataSource" matSort matSortActive="id"
 matSortDirection="asc">
   <ng-container matColumnDef="id">
@@ -23,7 +24,7 @@ matSortDirection="asc">
   <ng-container matColumnDef="action">
     <th mat-header-cell *matHeaderCellDef> Action </th>
     <td mat-cell *matCellDef="let user">
-      <button mat-button (click)="deleteUser(user.id,user.username)">Delete</button>
+      <button mat-button (click)="deleteUser(user.id)">Delete</button>
     </td>
   </ng-container>
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -33,6 +34,7 @@ matSortDirection="asc">
 showFirstLastButtons
 aria-label="Select page of periodic elements">
 </mat-paginator>
+</div>
 <br>
 <br>
 <app-ShowModel></app-ShowModel>

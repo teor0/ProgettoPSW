@@ -20,12 +20,11 @@ export class ProductDialogComponent implements OnInit{
   constructor(@Inject(MAT_DIALOG_DATA) private data: {
                   productToAdd: Product;
               },private dialogRef: MatDialogRef<ProductDialogComponent>,
-                private orderProductsService: OrderProductService,private userService:UserService){
-                  if (data.productToAdd)
-                    this.productToAdd = data.productToAdd;
+                private orderProductsService: OrderProductService, private userService:UserService){
+                  this.productToAdd = data.productToAdd;
   }
 
-  ngOnInit(){
+  ngOnInit(): void{
     this.userService.logStatusChange.subscribe(async status=>{
       this.logged=status;
     });

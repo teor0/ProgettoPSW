@@ -1,4 +1,4 @@
-import { Order } from 'src/app/models/Order';
+import { Order, OrderDTO } from 'src/app/models/Order';
 import { Component, Input, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { OrderService } from 'src/app/services/ModelServices/Order.service';
 import { User } from 'src/app/models/User';
@@ -14,10 +14,9 @@ import { ResponseService } from '../../ResponseService.service';
 })
 export class ShowOrderComponent implements OnInit, AfterViewInit{
 
-  order!:Order;
-  userOrders!:Order[];
+  userOrders!:OrderDTO[];
   @Input('user') user!:User;
-  dataSource= new MatTableDataSource<Order>();
+  dataSource= new MatTableDataSource<OrderDTO>();
   displayedColumns: string[] = ['id','total','createDate','status','action'];
   paginator!: MatPaginator;
   sort!: MatSort;
@@ -37,7 +36,7 @@ export class ShowOrderComponent implements OnInit, AfterViewInit{
   constructor(private orderService:OrderService, private responseService:ResponseService){}
 
   ngOnInit(){
-    this.dataSource=new MatTableDataSource<Order>();
+    this.dataSource=new MatTableDataSource<OrderDTO>();
     this.dataSource.paginator=this.paginator;
     this.dataSource.sort = this.sort;
   }
@@ -83,8 +82,8 @@ export class ShowOrderComponent implements OnInit, AfterViewInit{
 
   showResult(status:boolean, response:any){
     if(status){
-      this.userOrders=response as Order[];
-      this.dataSource=new MatTableDataSource<Order>(this.userOrders);
+      this.userOrders=response as OrderDTO[];
+      this.dataSource=new MatTableDataSource<OrderDTO>(this.userOrders);
       this.dataSource.paginator=this.paginator;
       this.dataSource.sort=this.sort;
       if(!this.hideRecap)
@@ -95,8 +94,8 @@ export class ShowOrderComponent implements OnInit, AfterViewInit{
   private refreshTable(){
     this.orderService.getByUser((status:boolean,response:any)=>{
       if(status){
-      this.userOrders=response as Order[];
-      this.dataSource=new MatTableDataSource<Order>(this.userOrders);
+      this.userOrders=response as OrderDTO[];
+      this.dataSource=new MatTableDataSource<OrderDTO>(this.userOrders);
       this.dataSource.paginator=this.paginator;
       this.dataSource.sort=this.sort;}},this.user);
 }

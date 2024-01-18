@@ -1,6 +1,6 @@
 <button mat-raised-button [matMenuTriggerFor]="menu">Cart action Menu<mat-icon>menu</mat-icon></button>
 <mat-menu #menu="matMenu">
   <button mat-button (click)="acquire()" [disabled]="!hasOrder">Acquire</button>
-  <button mat-button (click)="delete()">Empty cart</button>
+  <button mat-button (click)="delete()" [disabled]="!hasOrder">Empty cart</button>
 </mat-menu><app-ShowOrderProducts></app-ShowOrderProducts>
 

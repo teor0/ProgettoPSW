@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ADDRESS_SERVER, DELETE_USER, GET_USER_ID, REQUEST_LOGIN, REQUEST_SEARCH, REQUEST_USER } from 'src/app/helpers/constants';
+import { ADDRESS_SERVER, REQUEST_LOGIN, REQUEST_SEARCH, REQUEST_USER } from 'src/app/helpers/constants';
 import { RestManager } from 'src/app/managers/RestManager';
 import { User } from 'src/app/models/User';
 import { AuthService } from '../Auth/AuthService.service';
 import { ResponseService } from 'src/app/helpers/Response/ResponseService.service';
-import { Observable, Subject, async } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -74,18 +74,17 @@ export class UserService {
     this.authService.getTokenAsUser(user.username,user.password,this.loginProcess.bind(this,user));
   }
 
-  logout(user: User){
-    this.authService.logout(this.logoutSuccess.bind(this));
+  logout(user:User){
+    this.authService.logout(this.logoutSuccess.bind(this,user));
   }
 
-  private registerSuccess(user: User, status: boolean, response : any){
+  private registerSuccess(user: User, status: boolean){
     if(status){
-      this.responseService.openDialogOk(response);
       this.login(user);
     }
   }
 
-  private loginProcess(user:User,status: boolean, response:User){
+  private loginProcess(user:User,status: boolean){
     if(status)
       this.getUserByUsername(user.username,this.loginSuccess.bind(this));
   }
@@ -101,10 +100,9 @@ export class UserService {
     }
   }
 
-  private logoutSuccess(status: boolean, response: any){
+  private logoutSuccess(user:User,status: boolean, response: any){
     if(status){
       this.logStatusChange.next(!this.isLogged);
-      let user=JSON.parse(sessionStorage.getItem('user') as string) as User;
       if(user.role==='Admin')
         this.adminStatusChange.next(!this.isAdmin);
       sessionStorage.clear();
@@ -114,10 +112,10 @@ export class UserService {
   }
 
   //DELETE METHOD
-
-  deleteUser(id:number,username:string,callback:any){
+  deleteUser(id:number,callback:any){
     this.restManager.makeDeleteRequest(ADDRESS_SERVER,REQUEST_USER+'/'+id,callback);
   }
+
 
 }
 

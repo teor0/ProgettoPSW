@@ -22,7 +22,7 @@
       </p>
     </mat-card-content>
     <mat-card-actions align="end">
-      <button mat-raised-button>Add to cart</button>
+      <button mat-raised-button (click)="addToCart(product)">Add to cart<mat-icon>add_shopping_cart</mat-icon></button>
       <button mat-raised-button (click)="collapse()">Collapse</button>
     </mat-card-actions>
   </mat-card>

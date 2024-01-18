@@ -17,6 +17,7 @@ export interface Order {
   status: string;
   orderProducts: OrderProducts[];
 }
+
 export class OrderImpl implements Order{
   public id: number;
   public user: User;

@@ -80,15 +80,6 @@ export class RestManager{
         })
     }
 
-    /*public makeGetId(serverAddress: string, servicePath: string, callback: any, body?: any){
-      var requestPath = servicePath + "?";
-      for (let key in body) {
-          let value = body[key];
-          requestPath += key + "=" + value + "&"
-      }
-    return this.makeRequest(serverAddress, requestPath, "get", callback, body)
-    }*/
-
 
     public simpleMakeGetRequest(serverAddress: string, servicePath: string, callback?: any, body?: any){
       return this.makeRequest(serverAddress, servicePath, "get", callback, body)

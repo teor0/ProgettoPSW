@@ -3,8 +3,9 @@ import { Injectable } from '@angular/core';
 import { ResponseService } from 'src/app/helpers/Response/ResponseService.service';
 import { ADDRESS_SERVER, REQUEST_CART } from 'src/app/helpers/constants';
 import { RestManager } from 'src/app/managers/RestManager';
+import { Cart } from 'src/app/models/Cart';
 import { Order, OrderDTO, OrderDTOImpl } from 'src/app/models/Order';
-import { User } from 'src/app/models/User';
+import { User, UserDTO, UserDTOImpl } from 'src/app/models/User';
 
 @Injectable({
   providedIn: 'root'
@@ -12,15 +13,41 @@ import { User } from 'src/app/models/User';
 export class CartService {
 
   restManager:RestManager;
-  user!:User;
-
 
   constructor(private http:HttpClient, private responseService:ResponseService){
     this.restManager=new RestManager(http);
   }
 
+  //INITIALIZATION METHODS
+  initialSetCart(order:OrderDTO){
+    this.restManager.makePutRequest(ADDRESS_SERVER,REQUEST_CART+'/refresh',this.setSuccess.bind(this),order);
+  }
+
+  private setSuccess(status:boolean, response:any){
+    if(status)
+      sessionStorage.setItem('cart',JSON.stringify(response));
+  }
+
+  initialGetCart(user:User){
+    this.restManager.makeGetPathRequest(ADDRESS_SERVER,REQUEST_CART+'/show',this.retrieveSuccess.bind(this,user),user.id);
+  }
+
+  private retrieveSuccess(user:User,status:boolean, response:Cart){
+    if(status){
+      if(response.id===0){
+        var dto= new UserDTOImpl();
+        dto=dto.copyUser(user);
+        this.createCart(dto,
+          JSON.parse(sessionStorage.getItem('order') as string) as Order);
+      }
+      else{
+        this.initialSetCart(JSON.parse(sessionStorage.getItem('orderDTO') as string) as OrderDTO);
+      }
+    }
+  }
+
   //CREATE & DELETE
-  private createCart(user:User,order:Order){
+  createCart(user:UserDTO,order:Order){
     this.restManager.makePostRequest(ADDRESS_SERVER,REQUEST_CART,this.creationSuccess.bind(this,order),user)
   }
 
@@ -50,37 +77,12 @@ export class CartService {
     this.restManager.makeGetPathRequest(ADDRESS_SERVER,REQUEST_CART+'/show',callback,user.id);
   }
 
-
-  initialGetCart(user:User){
-    this.restManager.makeGetPathRequest(ADDRESS_SERVER,REQUEST_CART+'/show',this.retrieveSuccess.bind(this),user.id);
-  }
-
-  private retrieveSuccess(status:boolean, response:any){
-    if(status){
-      if(response===null)
-        this.createCart(JSON.parse(sessionStorage.getItem('user') as string) as User,
-          JSON.parse(sessionStorage.getItem('order') as string) as Order);
-      else{
-        this.initialSetCart(JSON.parse(sessionStorage.getItem('orderDTO') as string) as OrderDTO);
-      }
-    }
-  }
-
   setCart(callback:any,order:OrderDTO){
     this.restManager.makePutRequest(ADDRESS_SERVER,REQUEST_CART+'/refresh',callback,order);
   }
 
-  private setSuccess(status:boolean, response:any){
-    if(status)
-      sessionStorage.setItem('cart',JSON.stringify(response));
-  }
-
-  initialSetCart(order:OrderDTO){
-    this.restManager.makePutRequest(ADDRESS_SERVER,REQUEST_CART+'/refresh',this.setSuccess.bind(this),order);
-  }
-
   //CHECKOUT METHOD
-  checkout(callback:any,user:User){
+  checkout(callback:any,user:UserDTO){
     this.restManager.makePostRequest(ADDRESS_SERVER,REQUEST_CART+'/checkout',callback,user);
   }
 

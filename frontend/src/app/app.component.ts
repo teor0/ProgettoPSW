@@ -1,23 +1,25 @@
+import { OrderService } from './services/ModelServices/Order.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UserService } from './services/ModelServices/User.service';
-import { CartService } from './services/ModelServices/Cart.service';
+import { User } from './models/User';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit,OnDestroy {
+export class AppComponent implements OnInit, OnDestroy {
   links= ['User', 'Product'];
   activeLink = "";
   logged!: boolean;
   isAdmin!: boolean;
+  hasPending!: boolean;
 
-  constructor(private userService:UserService){
+  constructor(private userService:UserService, private orderService:OrderService){
   }
 
   logout(){
-    this.userService.logout(JSON.parse(sessionStorage.getItem('user') as string).username);
+    this.userService.logout(JSON.parse(sessionStorage.getItem('user') as string)as User);
   }
 
   ngOnInit() {
@@ -27,6 +29,9 @@ export class AppComponent implements OnInit,OnDestroy {
     this.userService.adminStatusChange.subscribe(async status=>{
       this.isAdmin=status;
     });
+    this.orderService.pendingChange.subscribe(async status=>{
+      this.hasPending=status;
+    })
     sessionStorage.setItem('storedProducts',JSON.stringify([]));
   }
 

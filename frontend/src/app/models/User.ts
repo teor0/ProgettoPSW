@@ -1,3 +1,40 @@
+export interface UserDTO{
+  username:string,
+  name: string,
+  email: string,
+  role:string
+}
+export class UserDTOImpl implements UserDTO{
+  public username:string;
+  public name: string;
+  public email:string;
+  public role:string;
+
+  constructor(){
+    this.username= '';
+    this.name= '';
+    this.email = '';
+    this.role='';
+  }
+
+  copy(c:UserDTO) : UserDTOImpl{
+    this.username = c.username;
+    this.name = c.name;
+    this.email = c.email;
+    this.role= c.role;
+    return this;
+  }
+
+  copyUser(c:User) : UserDTOImpl{
+    this.username = c.username;
+    this.name = c.name;
+    this.email = c.email;
+    this.role= c.role;
+    return this;
+  }
+
+}
+
 export interface User{
   id:number,
   username:string,

@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ResponseService } from 'src/app/helpers/Response/ResponseService.service';
 import { Cart } from 'src/app/models/Cart';
 import { Order } from 'src/app/models/Order';
-import { User } from 'src/app/models/User';
+import { User, UserDTO, UserDTOImpl } from 'src/app/models/User';
 import { CartService } from 'src/app/services/ModelServices/Cart.service';
 import { OrderService } from 'src/app/services/ModelServices/Order.service';
 
@@ -27,7 +27,9 @@ export class CartComponent implements OnInit{
   }
 
   acquire(){
-    this.cartService.checkout(this.acquireSuccess.bind(this),this.user);
+    var dto= new UserDTOImpl();
+    dto=dto.copyUser(this.user);
+    this.cartService.checkout(this.acquireSuccess.bind(this),dto);
   }
 
   private acquireSuccess(status:boolean,response:any){
@@ -36,6 +38,7 @@ export class CartComponent implements OnInit{
       sessionStorage.removeItem('order');
       sessionStorage.removeItem('orderDTO');
       this.hasOrder=false;
+      this.orderService.pendingChange.next(false);
     }
   }
 
@@ -50,8 +53,10 @@ export class CartComponent implements OnInit{
 
   private refreshCart(){
     var order=new OrderDTOImpl();
-    order=order.copyOrder(JSON.parse(sessionStorage.getItem('order') as string) as Order);
-    this.cartService.setCart(this.retrieveSuccess.bind(this),order);
+    if(sessionStorage.getItem('order')!=null){
+      order=order.copyOrder(JSON.parse(sessionStorage.getItem('order') as string) as Order);
+      this.cartService.setCart(this.retrieveSuccess.bind(this),order);
+    }
   }
 
   private retrieveSuccess(status:boolean,response:Cart){

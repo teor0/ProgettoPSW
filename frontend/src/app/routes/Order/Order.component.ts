@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Order, OrderImpl } from 'src/app/models/Order';
 import { User } from 'src/app/models/User';
 import { OrderService } from 'src/app/services/ModelServices/Order.service';
@@ -8,23 +8,20 @@ import { OrderService } from 'src/app/services/ModelServices/Order.service';
   templateUrl: './Order.component.html',
   styleUrls: ['./Order.component.css']
 })
-export class OrderComponent implements OnInit, AfterViewInit{
+export class OrderComponent implements OnInit{
 
   user!: User;
   order!:Order;
   hasPending!: boolean;
 
-  constructor(private orderService:OrderService) {
+  constructor(private orderService:OrderService){
     this.order=new OrderImpl();
     this.user=JSON.parse(sessionStorage.getItem('user') as string) as User;
     this.order.user=this.user;
     this.retrievePreviousOrder();
   }
 
-  ngOnInit(){
-  }
-
-  ngAfterViewInit(){
+  ngOnInit(): void{
     this.orderService.pendingChange.subscribe(async status=>{
       this.hasPending=status;
     })
@@ -37,7 +34,6 @@ export class OrderComponent implements OnInit, AfterViewInit{
   retrievePreviousOrder(){
     this.orderService.getByUserAndPendingNoCallback(this.user);
   }
-
 
 
 

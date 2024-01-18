@@ -79,16 +79,21 @@ export class ProductComponent implements OnInit, AfterViewInit {
     this.dataSourceSearch.filter = filterValue;
   }
 
-  hideAll(){
-    this.showAll=!this.showAll;
-  }
-
   searchByBarcode(){
     this.productService.getProductByBarcode(this.showProduct.bind(this),this.search.controls['searchControl'].value);
   }
 
   searchByName(){
     this.productService.getProductsByName(this.showProducts.bind(this),this.search.controls['searchControl'].value);
+  }
+
+  addToCart(product:Product){
+    this.responseService.openDialogAddCart(product);
+  }
+
+  //HIDE AND SHOW
+  hideAll(){
+    this.showAll=!this.showAll;
   }
 
   showProduct(status:boolean, response:Product){
@@ -118,10 +123,5 @@ export class ProductComponent implements OnInit, AfterViewInit {
   collapseSearchTab(){
     this.hideSearchProduct=!this.hideSearchProduct;
   }
-
-  addToCart(product:Product){
-    this.responseService.openDialogAddCart(product);
-  }
-
 
 }

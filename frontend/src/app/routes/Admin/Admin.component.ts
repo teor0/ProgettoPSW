@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, MatPaginatorIntl } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { ResponseService } from 'src/app/helpers/Response/ResponseService.service';
 import { User } from 'src/app/models/User';
 import { UserService } from 'src/app/services/ModelServices/User.service';
 
@@ -18,7 +19,7 @@ export class AdminComponent implements OnInit{
   @ViewChild(MatPaginator) paginator=new MatPaginator(new MatPaginatorIntl(), ChangeDetectorRef.prototype);
   @ViewChild(MatSort) sort=new MatSort();
 
-  constructor(private userService: UserService) {
+  constructor(private userService: UserService, private responseService:ResponseService) {
   }
 
   ngOnInit(): void {
@@ -35,17 +36,20 @@ export class AdminComponent implements OnInit{
     this.dataSource.sort = this.sort;
   }
 
-  deleteUser(id:number,username: string){
-    this.userService.deleteUser(id,username,this.refreshTable.bind(this));
+  deleteUser(id:number){
+    this.userService.deleteUser(id,this.refreshTable.bind(this));
   }
 
-  private refreshTable(status: boolean){
+  private refreshTable(status: boolean,response:any){
     if(status)
-    this.userService.getUsers().subscribe(response=>
+    {
+      this.responseService.openDialogOk(response);
+      this.userService.getUsers().subscribe(response=>
       {
        this.users=response;
        this.dataSource= new MatTableDataSource<User>(this.users);
       });
+    }
   }
 
 

@@ -14,4 +14,7 @@ export class UserComponent{
     this.user=JSON.parse(sessionStorage.getItem('user') as string) as User;
   }
 
+
+
+
 }

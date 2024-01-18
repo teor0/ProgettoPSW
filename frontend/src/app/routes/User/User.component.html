@@ -1,21 +1,29 @@
-<h1>User information</h1>
 <div class="user-resume" align="center">
-<p>
-  Name:
-  {{this.user.name}}
-  <br>
-  Email:
-  {{this.user.email}}
-  <br>
-  Password:
-  {{this.user.password}}
-  <br>
-  Username:
-  {{this.user.username}}
-  <br>
-  Role:
-  {{this.user.role}}
-  <br>
-</p>
+  <mat-card class="card-user">
+    <mat-card-header>
+      <mat-card-title>User information</mat-card-title>
+    </mat-card-header>
+    <mat-divider></mat-divider>
+    <mat-card-content>
+      <p>
+        Name:
+        {{this.user.name}}
+        <br>
+        Email:
+        {{this.user.email}}
+        <br>
+        Password:
+        {{this.user.password}}
+        <br>
+        Username:
+        {{this.user.username}}
+        <br>
+        Role:
+        {{this.user.role}}
+        <br>
+      </p>
+    </mat-card-content>
+  </mat-card>
+  <mat-divider></mat-divider>
 </div>
 <app-Vendor [user]="user" *ngIf="this.user.role==='Vendor' || this.user.role==='Admin'"></app-Vendor>

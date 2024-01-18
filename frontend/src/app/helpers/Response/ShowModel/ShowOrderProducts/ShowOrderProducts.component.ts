@@ -60,8 +60,12 @@ export class ShowOrderProductsComponent{
   }
 
   getOrderProducts(){
+    if(sessionStorage.getItem('order')!=null){
     var order=JSON.parse(sessionStorage.getItem('order') as string) as Order;
     this.orderProductsService.getByOrderId(this.success.bind(this),order);
+    }
+    else
+      this.responseService.openDialogCustom('There aren\'t products in your order');
   }
 
   private success(status:boolean,response:any){
