@@ -52,14 +52,14 @@ public class Utente {
     private String role;
 
     @ToString.Exclude
-    @OneToMany(fetch = LAZY,mappedBy = "user",cascade = {CascadeType.MERGE}, orphanRemoval = true)
+    @OneToMany(fetch = LAZY,mappedBy = "user",cascade = {CascadeType.MERGE})
     @JsonManagedReference(value = "user-orders")
     @JsonIgnore
     private List<Order> orders;
 
     @ToString.Exclude
     @JsonBackReference(value = "user")
-    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE})
     private Cart cart;
 
 }

@@ -2,12 +2,12 @@ package application.support.auth;
 
 public class Constants{
 
-    public static String ID_CLIENT="";
-    public static String CLIENT_NAME="";
+    public static String ID_CLIENT="90d4e5dc-b9ef-4311-b263-c0de6f93cb89";
+    public static String CLIENT_NAME="Project";
     public static String ADDRESS_AUTHENTICATION_SERVER= "http://localhost:8081/";
-    public static String REALM="";
+    public static String REALM="ProjectRealm";
     public static String CLIENT_ID = CLIENT_NAME;
-    public static String CLIENT_SECRET="";
+    public static String CLIENT_SECRET="CDq6yNvEQZyKoTtTUgizCqNaYknacEK7";
     static final String ADMIN_REALMS= "/admin/realms/";
 
 

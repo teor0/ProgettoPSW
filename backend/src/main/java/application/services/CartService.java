@@ -30,9 +30,9 @@ public class CartService {
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void createCart(UtenteDTO dto) throws UtenteNotExistsException, CartAlreadyExistsException {
-        if(!urepo.existsById(dto.getId()))
+        if(!urepo.existsByEmail(dto.getEmail()))
             throw new UtenteNotExistsException();
-        Utente u = urepo.findById(dto.getId()).get();
+        Utente u = urepo.findByEmail(dto.getEmail()).get();
         if(repo.existsByUser(u))
             throw new CartAlreadyExistsException();
         Cart c= new Cart();
@@ -73,7 +73,7 @@ public class CartService {
     }
 
     @Transactional(readOnly = true)
-    public CartDTO getCart(Long id) throws UtenteNotExistsException, CartNotExistsException{
+    public CartDTO getCart(Long id) throws UtenteNotExistsException, CartNotExistsException {
         if(!urepo.existsById(id))
             throw new UtenteNotExistsException();
         Utente u = urepo.findById(id).get();
@@ -84,9 +84,9 @@ public class CartService {
 
     @Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = {UtenteNotExistsException.class, QtaUnvaliableException.class, PriceChangedException.class}, propagation = Propagation.REQUIRED)
     public void acquire(UtenteDTO dto) throws QtaUnvaliableException, PriceChangedException, OrderNotExistsException, UtenteNotExistsException {
-        if(!urepo.existsById(dto.getId()))
+        if(!urepo.existsByEmail(dto.getEmail()))
             throw new UtenteNotExistsException();
-        Utente u = urepo.findById(dto.getId()).get();
+        Utente u = urepo.findByEmail(dto.getEmail()).get();
         Cart c = repo.findByUser(u).get();
         if(!orepo.existsById(c.getOrder().getId()))
             throw new OrderNotExistsException();

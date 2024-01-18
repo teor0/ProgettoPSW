@@ -59,7 +59,7 @@ public class Product {
 
     @ToString.Exclude
     @JsonIgnore
-    @OneToMany(fetch = LAZY,mappedBy = "product",cascade = {CascadeType.MERGE,CascadeType.REMOVE,CascadeType.REFRESH}, orphanRemoval = true)
+    @OneToMany(fetch = LAZY,mappedBy = "product",cascade = {CascadeType.MERGE,CascadeType.REMOVE,CascadeType.REFRESH})
     @JsonManagedReference(value = "product")
     private List<OrderProducts> orderProducts;
 

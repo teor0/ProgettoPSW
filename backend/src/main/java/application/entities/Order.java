@@ -42,12 +42,12 @@ public class Order {
     private String status="Pending";
 
     @ToString.Exclude
-    @OneToMany(fetch = EAGER,mappedBy = "order",cascade = {CascadeType.REMOVE,CascadeType.MERGE}, orphanRemoval = true)
+    @OneToMany(fetch = EAGER,mappedBy = "order",cascade = {CascadeType.REMOVE,CascadeType.MERGE})
     @JsonManagedReference(value = "orderProducts")
     private List<OrderProducts> orderProducts;
 
     @JsonBackReference(value = "order")
-    @OneToOne(mappedBy = "order",  cascade = {CascadeType.REMOVE})
+    @OneToOne(mappedBy = "order")
     private Cart cart;
 
 

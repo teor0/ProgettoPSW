@@ -30,7 +30,6 @@ public class OrderProductController {
     public ResponseEntity<JSONObject> create(@Valid @RequestBody OrderProductsDTO dto){
         JSONObject response= new JSONObject();
         try{
-            System.out.println(dto);
             orderProductService.createOrderProduct(dto);
         }
         catch(OrderNotExistsException e) {

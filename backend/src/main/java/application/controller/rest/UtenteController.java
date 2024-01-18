@@ -2,8 +2,10 @@ package application.controller.rest;
 
 import application.entities.Utente;
 import application.services.UtenteService;
+import application.support.dto.UtenteDTO;
 import application.support.exceptions.AuthenticationException;
 import application.support.exceptions.UtenteNotExistsException;
+import jakarta.validation.Valid;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -71,6 +73,7 @@ public class UtenteController {
         }
         return new ResponseEntity<>(u.getOrders(),HttpStatus.OK);
     }
+
 
     @PreAuthorize(value="hasRole('ROLE_Admin')")
     @DeleteMapping("/{id}")

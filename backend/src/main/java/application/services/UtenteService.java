@@ -2,11 +2,14 @@ package application.services;
 
 import application.entities.Utente;
 import application.support.auth.KeycloakService;
+import application.support.dto.UtenteDTO;
 import application.support.exceptions.AuthenticationException;
 import application.support.exceptions.UtenteNotExistsException;
 import application.support.exceptions.MailAlreadyExistsException;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -89,9 +92,10 @@ public class UtenteService {
         if(!repo.existsById(id))
             throw new UtenteNotExistsException();
         Utente u=repo.findById(id).get();
-        repo.deleteById(id);
-        if(!keycloakService.deleteUser(keycloakService.getToken(),u.getUsername()).isSameCodeAs(HttpStatus.NO_CONTENT))
+        if(!keycloakService.deleteUser(keycloakService.getToken(),u.getUsername())
+                .isSameCodeAs(HttpStatus.NO_CONTENT))
             throw new AuthenticationException();
+        repo.deleteById(id);
     }
 
 }

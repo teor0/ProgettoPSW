@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import application.repositories.UtenteRepository;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -66,11 +65,16 @@ public class OrderService{
     }
 
     @Transactional(readOnly = true)
-    public List<Order> showByUser(Long id) throws UtenteNotExistsException {
+    public List<OrderDTO> showByUser(Long id) throws UtenteNotExistsException {
         if(!urepo.existsById(id))
             throw new UtenteNotExistsException();
         Utente u = urepo.findById(id).get();
-        return repo.findByUser(u);
+        List<Order> l=repo.findByUser(u);
+        List<OrderDTO> ret= new ArrayList<>();
+        for(Order o: l){
+            ret.add(new OrderDTO(o));
+        }
+        return ret;
     }
 
 

@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -46,7 +45,7 @@ public class OrderController {
 
     @GetMapping(value = "/search", params = {"user"})
     public ResponseEntity readOrderByUser(@RequestParam(value = "user") Long id){
-        List<Order> o;
+        List<OrderDTO> o;
         try{
             o=orderService.showByUser(id);
         }

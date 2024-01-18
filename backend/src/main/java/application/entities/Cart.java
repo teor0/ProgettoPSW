@@ -16,6 +16,7 @@ public class Cart {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @NotNull
     @JsonManagedReference(value = "user")
     @JoinColumn(name = "user_id")
     @OneToOne

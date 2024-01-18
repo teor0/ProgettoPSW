@@ -80,7 +80,6 @@ public class KeycloakService {
         JSONObject pass= new JSONObject();
         pass.put("type","password");
         pass.put("value",password);
-        System.out.println(password);
         cred.add(pass);
         user.put("username",username);
         user.put("firstName",firstName);
@@ -111,6 +110,22 @@ public class KeycloakService {
         return response.getStatusCode();
     }
 
+    public HttpStatusCode updateEmail(JSONObject token, String username,String email){
+        String id_user= getUserId(token,username);
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers= new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth((String)token.get("access_token"));
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        JSONObject user= new JSONObject();
+        user.put("email",email);
+        HttpEntity<JSONObject> request = new HttpEntity<>(user,headers);
+        ResponseEntity<JSONObject> response=restTemplate
+                .postForEntity(Constants.REQUEST_USER +"/"+id_user,
+                        request, JSONObject.class);
+        return response.getStatusCode();
+    }
+
     public HttpStatusCode deleteUser(JSONObject token,String username){
         String id_user= getUserId(token,username);
         RestTemplate restTemplate = new RestTemplate();
@@ -121,7 +136,6 @@ public class KeycloakService {
         HttpEntity<JSONArray> request = new HttpEntity<>(headers);
         ResponseEntity<JSONObject> response=restTemplate
                 .exchange(Constants.REQUEST_USER+"/"+id_user,HttpMethod.DELETE,request,JSONObject.class);
-        System.out.println(response.getStatusCode());
         return response.getStatusCode();
     }
 
