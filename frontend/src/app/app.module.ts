@@ -1,5 +1,5 @@
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button'
 import { MatDialogModule } from '@angular/material/dialog';
@@ -17,7 +17,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatOptionModule } from '@angular/material/core';
-import { AuthInterceptor } from './helpers/AuthInterceptor';
+//import { AuthInterceptor } from './helpers/AuthInterceptor';
 import { ErrorHandlerInterceptor } from './helpers/Error/ErrorInterceptor';
 import { ResponseComponent } from './helpers/Response/Response.component';
 import { LoginComponent } from './routes/Login/Login.component';
@@ -37,6 +37,12 @@ import { CartComponent } from './routes/Cart/Cart.component';
 import { UpdateDialogComponent } from './helpers/UpdateDialog/UpdateDialog.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
+import { CompleteRegistrationComponent } from './routes/CompleteRegistration/CompleteRegistration.component';
+import { initializeKeycloak } from './services/Auth/KeycloakInit.factory';
+import { AuthService } from './services/Auth/AuthService.service';
+import { CompleteLoginComponent } from './routes/CompleteLogin/CompleteLogin.component';
+import { OrderProductsDialogComponent } from './helpers/Response/OrderProductsDialog/OrderProductsDialog.component';
 
 
 @NgModule({
@@ -48,6 +54,9 @@ import { MatNativeDateModule } from '@angular/material/core';
     UpdateDialogComponent,
     ProductDialogComponent,
     LoginComponent,
+    CompleteRegistrationComponent,
+    CompleteLoginComponent,
+    OrderProductsDialogComponent,
     OrderComponent,
     CartComponent,
     UserComponent,
@@ -59,6 +68,7 @@ import { MatNativeDateModule } from '@angular/material/core';
   imports: [
     BrowserModule,
     AppRoutingModule,
+    KeycloakAngularModule,
     MatButtonModule,
     HttpClientModule,
     BrowserAnimationsModule,
@@ -82,7 +92,8 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatCardModule
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: APP_INITIALIZER, useFactory: initializeKeycloak, multi: true, deps: [KeycloakService, AuthService] },
+    //{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorHandlerInterceptor, multi:true}
   ],
   bootstrap: [AppComponent]

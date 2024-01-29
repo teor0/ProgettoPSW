@@ -1,3 +1,4 @@
+import { OrderProducts } from 'src/app/models/Orderproducts';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -6,6 +7,7 @@ import { Product } from 'src/app/models/Product';
 import { ProductDialogComponent } from './ProductDialog/ProductDialog.component';
 import { RestResponse } from 'src/app/models/RestResponse';
 import { UpdateDialogComponent } from '../UpdateDialog/UpdateDialog.component';
+import { OrderProductsDialogComponent } from './OrderProductsDialog/OrderProductsDialog.component';
 
 @Injectable({
   providedIn: 'root'
@@ -47,10 +49,22 @@ export class ResponseService {
     })
   }
 
+  openDialogUpdateOP(orderProducts:OrderProducts): void{
+    this.dialog.open(OrderProductsDialogComponent,{
+      data:{orderProductsToUpdate:orderProducts},
+    }).afterClosed().subscribe((response)=>{
+      if(response==='Success')
+        this.openDialogCustom('Quantity updated');
+      });
+  }
+
   openDialogAddCart(product: Product,):void {
     this.dialog.open(ProductDialogComponent,{
       data:{productToAdd:product}
-    }).afterClosed().subscribe((resp)=>this.openDialogCartOk());
+    }).afterClosed().subscribe((response)=>{
+      if(response==='Add')
+        this.openDialogCartOk()
+      });
   }
 
   openDialogUpdate(product: Product, property:string, callback:any):void {

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = {"https://localhost:4200"})
+@CrossOrigin(origins = {"http://localhost:4200"})
 @RequestMapping("/order-product")
 @PreAuthorize(value="hasRole('ROLE_User')")
 public class OrderProductController {

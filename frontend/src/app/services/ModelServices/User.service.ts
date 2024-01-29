@@ -3,10 +3,8 @@ import { Injectable } from '@angular/core';
 import { ADDRESS_SERVER, REQUEST_LOGIN, REQUEST_SEARCH, REQUEST_USER } from 'src/app/helpers/constants';
 import { RestManager } from 'src/app/managers/RestManager';
 import { User } from 'src/app/models/User';
-import { AuthService } from '../Auth/AuthService.service';
+import { Observable } from 'rxjs';
 import { ResponseService } from 'src/app/helpers/Response/ResponseService.service';
-import { Observable, Subject } from 'rxjs';
-import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -14,24 +12,27 @@ import { Router } from '@angular/router';
 export class UserService {
 
   restManager: RestManager;
-  isLogged: boolean=false;
-  logStatusChange: Subject<boolean> = new Subject<boolean>();
-  isAdmin: boolean=false;
-  adminStatusChange: Subject<boolean> = new Subject<boolean>();
 
-  constructor(private http:HttpClient, private authService: AuthService,
-    private responseService:ResponseService, private router:Router){
+  constructor(private http:HttpClient, private responseService:ResponseService){
     this.restManager= new RestManager(http);
-    this.logStatusChange.subscribe(async status=>{
-      this.isLogged=status;
-    });
-    this.adminStatusChange.subscribe(async status=>{
-      this.isAdmin=status;
-    });
+  }
+
+  //CREATE & DELETE
+  createUser(user:User, callback:any){
+    this.restManager.makePostRequest(ADDRESS_SERVER,REQUEST_LOGIN,callback,user);
+  }
+
+  private creationSuccess(status:boolean,response:any){
+    if(status)
+      this.responseService.openDialogOk(response);
+  }
+
+
+  deleteUser(id:number,callback:any){
+    this.restManager.makeDeleteRequest(ADDRESS_SERVER,REQUEST_USER+'/'+id,callback);
   }
 
   //GETTERS
-
   getUserById(callback: any, id: number){
     this.restManager.makeGetPathRequest(ADDRESS_SERVER,REQUEST_USER+REQUEST_SEARCH,callback,id);
   }
@@ -62,58 +63,6 @@ export class UserService {
 
   getOrdersByUserId(callback: any, id: number){
     this.restManager.makeGetRequest(ADDRESS_SERVER,REQUEST_USER+'/orders',callback,id);
-  }
-
-
-  //LOGIN METHODS
-  register(user: User ){
-    this.restManager.makePostRequest(ADDRESS_SERVER,REQUEST_LOGIN,this.registerSuccess.bind(this,user),user);
-  }
-
-  login(user: User){
-    this.authService.getTokenAsUser(user.username,user.password,this.loginProcess.bind(this,user));
-  }
-
-  logout(user:User){
-    this.authService.logout(this.logoutSuccess.bind(this,user));
-  }
-
-  private registerSuccess(user: User, status: boolean){
-    if(status){
-      this.login(user);
-    }
-  }
-
-  private loginProcess(user:User,status: boolean){
-    if(status)
-      this.getUserByUsername(user.username,this.loginSuccess.bind(this));
-  }
-
-  private loginSuccess(status: boolean, user: any){
-    if(status){
-      this.responseService.openDialogOk(user);
-      sessionStorage.setItem('user',JSON.stringify(user));
-      this.logStatusChange.next(!this.isLogged);
-      if(user.role==='Admin')
-        this.adminStatusChange.next(!this.isAdmin);
-      this.router.navigateByUrl('/User')
-    }
-  }
-
-  private logoutSuccess(user:User,status: boolean, response: any){
-    if(status){
-      this.logStatusChange.next(!this.isLogged);
-      if(user.role==='Admin')
-        this.adminStatusChange.next(!this.isAdmin);
-      sessionStorage.clear();
-      sessionStorage.setItem('storedProducts',JSON.stringify([]));
-      this.router.navigateByUrl('');
-    }
-  }
-
-  //DELETE METHOD
-  deleteUser(id:number,callback:any){
-    this.restManager.makeDeleteRequest(ADDRESS_SERVER,REQUEST_USER+'/'+id,callback);
   }
 
 

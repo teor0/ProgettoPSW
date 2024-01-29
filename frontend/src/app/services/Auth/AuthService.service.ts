@@ -1,7 +1,12 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { GET_TOKEN, CLIENT_ID, CLIENT_SECRET, END_SESSION, POST_LOGOUT_REDIRECT } from '../../helpers/constants';
-import { RestManager } from 'src/app/managers/RestManager';
+import { KeycloakService } from 'keycloak-angular';
+import { KeycloakProfile } from 'keycloak-js';
+import { UserImpl } from 'src/app/models/User';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { UserService } from '../ModelServices/User.service';
+import { Router } from '@angular/router';
+import { ResponseService } from 'src/app/helpers/Response/ResponseService.service';
+import { OrderService } from '../ModelServices/Order.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,90 +14,110 @@ import { RestManager } from 'src/app/managers/RestManager';
 
 export class AuthService {
 
-  restManager: RestManager;
+  private profile: KeycloakProfile | undefined;
+  private jwtDecoder = new JwtHelperService();
 
-  constructor(private http:HttpClient) {
-    this.restManager=new RestManager(http);
+
+  //event handling thanks to https://github.com/mauriciovigolo/keycloak-angular/issues/291
+  constructor(private keycloakService: KeycloakService, private userService:UserService,
+              private router:Router, private responseService:ResponseService, private orderService:OrderService){
+    /*this.keycloakService.keycloakEvents$.subscribe(async(e: KeycloakEvent) =>{
+      if (e.type == KeycloakEventType.OnAuthSuccess){
+      }
+      if (e.type == KeycloakEventType.OnTokenExpired){
+        console.log('Keycloak event: TokenExpired');
+      }
+    });*/
   }
 
-  getToken(callback: any){
-    sessionStorage.removeItem('token');
-    var headers= {'Content-Type': 'application/x-www-form-urlencoded'};
-    var body= new URLSearchParams({
-      'client_id': CLIENT_ID,
-      'client_secret': CLIENT_SECRET,
-      'grant_type': 'client_credentials'
-    });
-    this.http.request('post',END_SESSION,{body,'headers':headers}).subscribe({
-      next:(resp: any)=>{
-        callback(true,resp);
-      },
-      error: (error: HttpErrorResponse) => {
-        callback(false,error);
-      },
-    });
-  }
-
-
-  logout(callback: any){
-    sessionStorage.removeItem('token');
-    let token = sessionStorage.getItem('refresh_token');
-    let id_token = sessionStorage.getItem('id_token');
-    var headers= {'Content-Type': 'application/x-www-form-urlencoded'};
-    var body= new URLSearchParams({
-      'refresh_token': token as string,
-      'post_logout_redirect_uri': POST_LOGOUT_REDIRECT,
-      'id_token_hint': id_token as string,
-      'client_id': CLIENT_ID,
-      'client_secret': CLIENT_SECRET,
-      'grant_type': 'refresh_token'
-    });
-    this.http.request('post',END_SESSION,{body,'headers':headers}).subscribe({
-      next:(resp: any)=>{
-        callback(true,resp);
-      },
-      error: (error: HttpErrorResponse) => {
-        callback(false,error);
-      },
+  createUserProfile(){
+    this.keycloakService.loadUserProfile().then(profile =>{
+      this.profile = profile;
+      this.createUser(this.profile!)
     });
   }
 
-  getTokenAsUser(username: string, password: string, callback: any){
-    sessionStorage.removeItem('token');
-    var headers= {'Content-Type': 'application/x-www-form-urlencoded'};
-    var body= new URLSearchParams({
-      'username': username,
-      'password': password,
-      'client_id': CLIENT_ID,
-      'client_secret': CLIENT_SECRET,
-      'grant_type': 'password',
-      'scope': 'openid profile email'
-    });
-    this.http.request('post',GET_TOKEN,{body,'headers':headers}).subscribe({
-      next: (response: any) => {
-        sessionStorage.setItem('token',response.access_token);
-        sessionStorage.setItem('refresh_token',response.refresh_token);
-        sessionStorage.setItem('id_token', response.id_token);
-        callback(true,response);
-      },
-      error: (error: HttpErrorResponse) => {
-          console.log(error);
-          callback(false, error);
-      },
+  loadUserProfile(){
+    this.keycloakService.loadUserProfile().then(profile =>{
+      this.profile = profile;
+      this.constructUser(this.profile.username!)
     });
   }
 
-  useRefreshToken(){
-    var token = sessionStorage.getItem('refresh_token');
-    sessionStorage.setItem('noToken', 'yes');
-    var headers= {'Content-Type': 'application/x-www-form-urlencoded'};
-    var body= new URLSearchParams({
-      'client_id': CLIENT_ID,
-      'client_secret': CLIENT_SECRET,
-      'grant_type': 'refresh_token',
-      'refresh_token': token as string
+  private constructUser(username: string){
+    this.userService.getUserByUsername(username!,this.setUser.bind(this));
+  }
+
+  private setUser(status:boolean, response:any){
+    if(status){
+      sessionStorage.setItem('user',JSON.stringify(response));
+      this.orderService.getByUserAndPendingNoCallback(response);
+      this.router.navigateByUrl('');
+      this.responseService.openDialogCustom('Redirected to home page');
+    }
+  }
+
+  private createUser(profile:KeycloakProfile){
+    var user=new UserImpl();
+    user.name=profile.firstName! +' '+ profile.lastName!;
+    user.email=profile.email!;
+    user.username=profile.username!;
+    if(this.isUser())
+      user.role='User';
+    else if(this.isVendor())
+      user.role='Vendor';
+    else if(this.isAdmin())
+      user.role='Admin';
+    this.userService.createUser(user,this.constructUser.bind(this,user.username));
+  }
+
+  login(){
+    this.keycloakService.login({redirectUri: "http://localhost:4200/complete-login"});
+  }
+
+  logout(){
+    this.keycloakService.logout("http://localhost:4200").then(() =>{
+    },
+    error =>{
+      console.error(error);
     });
-    return this.http.request('post',GET_TOKEN,{body,'headers':headers});
+    sessionStorage.clear();
+    this.profile = undefined;
+  }
+
+  register(): void{
+    this.keycloakService.register({redirectUri: "http://localhost:4200/complete-registration"});
+  }
+
+  getToken(){
+    this.keycloakService.getToken().then(value=>{
+      sessionStorage.setItem('token',JSON.stringify(value));
+    });
+  }
+
+  parseToken(){
+    console.log(this.jwtDecoder.decodeToken(sessionStorage.getItem('token') as string));
+  }
+
+  getUsername(): string{
+    return this.keycloakService.getKeycloakInstance()?.profile?.username as string;
+  }
+
+  //prendo tutti i ruoli del user loggato
+  getRoles(): string[]{
+    return this.keycloakService.getUserRoles();
+  }
+
+  isAdmin():boolean{
+    return this.keycloakService.getUserRoles().includes('Admin');
+  }
+
+  isVendor():boolean{
+    return this.keycloakService.getUserRoles().includes('Vendor');
+  }
+
+  isUser():boolean{
+    return this.keycloakService.getUserRoles().includes('User');
   }
 
 }

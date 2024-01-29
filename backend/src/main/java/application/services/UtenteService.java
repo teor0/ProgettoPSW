@@ -29,30 +29,7 @@ public class UtenteService {
     public void addUtente(Utente u) throws MailAlreadyExistsException, AuthenticationException {
         if(repo.existsByEmail(u.getEmail()))
             throw new MailAlreadyExistsException();
-        String name;
-        String surname;
-        String[] nameSurname= u.getName().split("\\s+");
-        switch (nameSurname.length) {
-            case(3): {
-                name = nameSurname[0] + " " + nameSurname[1];
-                surname = nameSurname[2];
-                break;
-            }
-            case(4): {
-                name = nameSurname[0] + " " + nameSurname[1] + " " + nameSurname[2];
-                surname = nameSurname[3];
-                break;
-            }
-            default: {
-                name = nameSurname[0];
-                surname = nameSurname[1];
-            }
-        }
-        if(keycloakService.registerUser(keycloakService.getToken(),u.getUsername(),name,surname,
-                u.getEmail(),u.getPassword(),u.getRole()).isSameCodeAs(HttpStatus.NO_CONTENT))
-            repo.save(u);
-        else
-            throw new AuthenticationException();
+        repo.save(u);
     }
 
     @Transactional(readOnly = true)

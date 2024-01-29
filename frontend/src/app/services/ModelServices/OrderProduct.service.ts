@@ -43,6 +43,12 @@ export class OrderProductService {
     this.restManager.makeGetPathRequest(ADDRESS_SERVER,REQUEST_ORDERPRODUCTS,callback,id);
   }
 
+  //UPDATE
+  updateOP(orderProducts:OrderProducts){
+    this.restManager.makePutRequest(ADDRESS_SERVER,REQUEST_ORDERPRODUCTS+'/update',orderProducts);
+  }
+
+
 
 
 }

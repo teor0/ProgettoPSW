@@ -55,6 +55,7 @@ export class ShowOrderProductsComponent{
     this.dataSource.filter = filterValue;
   }
 
+  //GETTERS
   getOPById(id:number){
     this.orderProductsService.getById(this.successShowInfo.bind(this),id);
   }
@@ -68,6 +69,14 @@ export class ShowOrderProductsComponent{
       this.responseService.openDialogCustom('There aren\'t products in your order');
   }
 
+  getTotal(): number{
+    var tot=0.0;
+    for(let op of this.orderProducts){
+      tot+=op.price*op.quantity;
+    }
+    return tot;
+  }
+
   private success(status:boolean,response:any){
     if(status){
       this.orderProducts=response;
@@ -79,6 +88,7 @@ export class ShowOrderProductsComponent{
     }
   }
 
+  //DELETE
   delete(id:number){
     this.orderProductsService.deleteOP(id,this.successDelete.bind(this));
   }
@@ -90,6 +100,13 @@ export class ShowOrderProductsComponent{
     }
   }
 
+
+  //UPDATE
+  updateQuantity(orderProducts: OrderProducts){
+    this.responseService.openDialogUpdateOP(orderProducts);
+  }
+
+  //HIDE & SHOW
   showInfo(id:number){
     this.productService.getProductById(this.successShowInfo.bind(this),id);
   }
@@ -102,7 +119,6 @@ export class ShowOrderProductsComponent{
     }
   }
 
-
   showRecap(){
     this.hideRecap=!this.hideRecap;
   }
@@ -111,12 +127,6 @@ export class ShowOrderProductsComponent{
     this.hideMoreInfo=!this.hideMoreInfo;
   }
 
-  getTotal(): number{
-    var tot=0.0;
-    for(let op of this.orderProducts){
-      tot+=op.price*op.quantity;
-    }
-    return tot;
-  }
+
 
 }

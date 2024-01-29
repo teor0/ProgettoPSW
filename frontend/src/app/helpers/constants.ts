@@ -7,8 +7,7 @@ export const CLIENT_SECRET ="CDq6yNvEQZyKoTtTUgizCqNaYknacEK7";
 export const CLIENT_ID ="Project";
 
 //addresses
-export const ADDRESS_SERVER = "https://localhost:8082";
-export const POST_LOGOUT_REDIRECT = "http://localhost:4200/Home";
+export const ADDRESS_SERVER = "http://localhost:8082";
 export const ADDRESS_AUTHENTICATION_SERVER = "http://localhost:8081";
 export const ADMIN_REALMS= "/admin/realms/";
 export const DELETE_USER= ADDRESS_AUTHENTICATION_SERVER+ADMIN_REALMS+REALM+'/users/';
@@ -23,7 +22,7 @@ export const END_SESSION = ADDRESS_AUTHENTICATION_SERVER+"/realms/"+REALM+"/prot
 
 //requests
 export const REQUEST_USER = "/user";
-export const REQUEST_LOGIN ="/Login";
+export const REQUEST_LOGIN ="/Authentication";
 export const REQUEST_SEARCH ="/search";
 export const REQUEST_PRODUCT = "/products";
 export const REQUEST_ORDER = "/order";

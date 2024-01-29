@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component} from '@angular/core';
 import { User } from 'src/app/models/User';
 
 @Component({
@@ -8,13 +8,11 @@ import { User } from 'src/app/models/User';
 })
 export class UserComponent{
 
-  user: User;
+  user!: User;
 
   constructor() {
     this.user=JSON.parse(sessionStorage.getItem('user') as string) as User;
   }
-
-
 
 
 }

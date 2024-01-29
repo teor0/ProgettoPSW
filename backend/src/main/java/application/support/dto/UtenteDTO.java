@@ -14,12 +14,14 @@ import lombok.ToString;
 public class UtenteDTO {
 
     private Long id;
+    private String username;
     private String name;
     private String email;
     private String role;
 
     public UtenteDTO(){
         this.id=0L;
+        this.username=null;
         this.name=null;
         this.email=null;
         this.role=null;
@@ -27,6 +29,7 @@ public class UtenteDTO {
 
     public UtenteDTO(Utente u){
         this.id= u.getId();
+        this.username=u.getUsername();
         this.name=u.getName();
         this.email=u.getEmail();
         this.role=u.getRole();

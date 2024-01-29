@@ -33,6 +33,7 @@ export class ProductComponent implements OnInit, AfterViewInit {
   }
 
   search: FormGroup;
+  filterForm!: FormControl;
   hideSearchProduct: boolean=true;
   hideTab: boolean=true;
   products!:Product[];
@@ -43,10 +44,11 @@ export class ProductComponent implements OnInit, AfterViewInit {
   showAll=true;
 
 
-  constructor(private productService:ProductService, private responseService:ResponseService,){
+  constructor(private productService:ProductService, private responseService:ResponseService){
                 this.search= new FormGroup({
                   searchControl: new FormControl(null)
                 })
+                this.filterForm=new FormControl(null)
   }
 
   ngOnInit(): void {

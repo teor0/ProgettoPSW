@@ -5,7 +5,7 @@ import { ResponseService } from 'src/app/helpers/Response/ResponseService.servic
 import { ADDRESS_SERVER, REQUEST_ORDER, REQUEST_SEARCH } from 'src/app/helpers/constants';
 import { RestManager } from 'src/app/managers/RestManager';
 import { Order, OrderDTO, OrderImpl } from 'src/app/models/Order';
-import { User, UserDTOImpl } from 'src/app/models/User';
+import { User } from 'src/app/models/User';
 import { CartService } from './Cart.service';
 import { Product } from 'src/app/models/Product';
 import { OrderProductService } from './OrderProduct.service';

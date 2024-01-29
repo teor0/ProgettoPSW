@@ -12,8 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = {"https://localhost:4200"})
-@RequestMapping("/Login")
+@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:4200/*" })
+@RequestMapping("/Authentication")
 public class RegistrationController {
 
     @Autowired

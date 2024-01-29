@@ -4,7 +4,7 @@ import { Observable, catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../services/Auth/AuthService.service';
 
 
-@Injectable()
+/*@Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
 
@@ -58,4 +58,4 @@ export class AuthInterceptor implements HttpInterceptor {
   }
 
 
-}
+}*/

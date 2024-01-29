@@ -111,10 +111,7 @@ export class VendorComponent{
       this.responseService.openDialogOk(response);
   }
 
-
-
   //SEARCH
-
   searchByName(){
     this.productService.getProductsByName(this.showProducts.bind(this),this.searchForm.controls['searchingForm'].value);
   }
@@ -173,6 +170,10 @@ export class VendorComponent{
 
   hideTable(){
     this.hideTab=!this.hideTab;
+  }
+
+  hideSearchResult(){
+    this.searchResult=undefined;
   }
 
   showSearch(){

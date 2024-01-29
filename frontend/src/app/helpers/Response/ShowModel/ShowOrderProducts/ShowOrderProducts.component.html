@@ -26,10 +26,13 @@
     </ng-container>
     <ng-container matColumnDef="action">
       <th mat-header-cell *matHeaderCellDef> Action </th>
-      <td mat-cell *matCellDef="let op">
-        <button mat-raised-button (click)="delete(op.id)">Delete</button>
-        <br>
+      <td mat-cell *matCellDef="let op" align="center">
+        <button mat-raised-button (click)="delete(op.id)" color="warn">Delete</button>
+        <mat-divider></mat-divider>
+        <button mat-raised-button (click)="updateQuantity(op)">Change quantity ordered</button>
+        <mat-divider></mat-divider>
         <button mat-raised-button (click)="showInfo(op.productId)">More info</button>
+        <mat-divider></mat-divider>
       </td>
       <td mat-footer-cell *matFooterCellDef></td>
     </ng-container>

@@ -5,7 +5,7 @@ import { ADDRESS_SERVER, REQUEST_CART } from 'src/app/helpers/constants';
 import { RestManager } from 'src/app/managers/RestManager';
 import { Cart } from 'src/app/models/Cart';
 import { Order, OrderDTO, OrderDTOImpl } from 'src/app/models/Order';
-import { User, UserDTO, UserDTOImpl } from 'src/app/models/User';
+import { User } from 'src/app/models/User';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +20,7 @@ export class CartService {
 
   //INITIALIZATION METHODS
   initialSetCart(order:OrderDTO){
-    this.restManager.makePutRequest(ADDRESS_SERVER,REQUEST_CART+'/refresh',this.setSuccess.bind(this),order);
+    this.restManager.makePutRequest(ADDRESS_SERVER,REQUEST_CART+'/refresh',order,this.setSuccess.bind(this));
   }
 
   private setSuccess(status:boolean, response:any){
@@ -35,10 +35,7 @@ export class CartService {
   private retrieveSuccess(user:User,status:boolean, response:Cart){
     if(status){
       if(response.id===0){
-        var dto= new UserDTOImpl();
-        dto=dto.copyUser(user);
-        this.createCart(dto,
-          JSON.parse(sessionStorage.getItem('order') as string) as Order);
+        this.createCart(user,JSON.parse(sessionStorage.getItem('order') as string) as Order);
       }
       else{
         this.initialSetCart(JSON.parse(sessionStorage.getItem('orderDTO') as string) as OrderDTO);
@@ -47,7 +44,7 @@ export class CartService {
   }
 
   //CREATE & DELETE
-  createCart(user:UserDTO,order:Order){
+  createCart(user:User,order:Order){
     this.restManager.makePostRequest(ADDRESS_SERVER,REQUEST_CART,this.creationSuccess.bind(this,order),user)
   }
 
@@ -78,11 +75,11 @@ export class CartService {
   }
 
   setCart(callback:any,order:OrderDTO){
-    this.restManager.makePutRequest(ADDRESS_SERVER,REQUEST_CART+'/refresh',callback,order);
+    this.restManager.makePutRequest(ADDRESS_SERVER,REQUEST_CART+'/refresh',order,callback);
   }
 
   //CHECKOUT METHOD
-  checkout(callback:any,user:UserDTO){
+  checkout(callback:any,user:User){
     this.restManager.makePostRequest(ADDRESS_SERVER,REQUEST_CART+'/checkout',callback,user);
   }
 

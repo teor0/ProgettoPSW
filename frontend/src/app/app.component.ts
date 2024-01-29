@@ -1,6 +1,8 @@
 import { OrderService } from './services/ModelServices/Order.service';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UserService } from './services/ModelServices/User.service';
+import { AuthService } from './services/Auth/AuthService.service';
+import { KeycloakService } from 'keycloak-angular';
 import { User } from './models/User';
 
 @Component({
@@ -8,37 +10,31 @@ import { User } from './models/User';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit, OnDestroy {
-  links= ['User', 'Product'];
+export class AppComponent implements OnInit {
+
   activeLink = "";
   logged!: boolean;
   isAdmin!: boolean;
   hasPending!: boolean;
 
-  constructor(private userService:UserService, private orderService:OrderService){
+  constructor(private keycloakService: KeycloakService, private orderService:OrderService, private authService:AuthService){
+  }
+
+  async ngOnInit() {
+    this.orderService.pendingChange.subscribe(async status=>{
+      this.hasPending=status;
+    });
+    sessionStorage.setItem('storedProducts',JSON.stringify([]));
+    this.logged = await this.keycloakService.isLoggedIn();
+    if(this.logged){
+      this.isAdmin=this.authService.isAdmin();
+    }
   }
 
   logout(){
-    this.userService.logout(JSON.parse(sessionStorage.getItem('user') as string)as User);
+    this.authService.logout();
+    console.log(this.logged);
+    //this.logged=false;
   }
-
-  ngOnInit() {
-    this.userService.logStatusChange.subscribe(async status=>{
-      this.logged=status;
-    });
-    this.userService.adminStatusChange.subscribe(async status=>{
-      this.isAdmin=status;
-    });
-    this.orderService.pendingChange.subscribe(async status=>{
-      this.hasPending=status;
-    })
-    sessionStorage.setItem('storedProducts',JSON.stringify([]));
-  }
-
-  ngOnDestroy(){
-    this.userService.logStatusChange.unsubscribe();
-    this.userService.adminStatusChange.unsubscribe();
-  }
-
 
 }

@@ -22,4 +22,13 @@ export class OrderProductsImpl implements OrderProducts {
     this.price=product.price;
   }
 
+  copy(op:OrderProducts) : OrderProductsImpl{
+    this.id=op.id;
+    this.orderId=op.orderId;
+    this.productId=op.productId;
+    this.price=op.price;
+    this.quantity=op.quantity;
+    return this;
+  }
+
 }

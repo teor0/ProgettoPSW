@@ -28,6 +28,10 @@
   </mat-card>
   <mat-divider></mat-divider>
   <br>
+  <mat-form-field>
+    <mat-label>Filter</mat-label>
+    <input matInput (keyup)="applyFilter(filterForm.value)" placeholder="Something" formControlName="filterForm">
+  </mat-form-field>
   <mat-table #table [dataSource]="dataSourceSearch" matSort *ngIf="!hideTab">
     <ng-container matColumnDef="id">
       <th mat-sort-header mat-header-cell *matHeaderCellDef> Id </th>

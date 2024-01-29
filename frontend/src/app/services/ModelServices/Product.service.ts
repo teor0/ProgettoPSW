@@ -17,6 +17,21 @@ export class ProductService {
     this.restManager=new RestManager(http);
   }
 
+  //CREATE & DELETE
+  createProduct(product: Product){
+    this.restManager.makePostRequest(ADDRESS_SERVER,REQUEST_PRODUCT,this.creationSuccess.bind(this),product);
+  }
+
+  private creationSuccess(status:boolean,response:any){
+    if(status)
+      this.responseService.openDialogOk(response);
+  }
+
+  deleteProduct(id:number,callback:any){
+    this.restManager.makeDeleteRequest(ADDRESS_SERVER,REQUEST_PRODUCT+'/delete/'+id,callback);
+  }
+
+
   //GETTERS
 
   getProductById(callback:any, id:number){
@@ -57,23 +72,8 @@ export class ProductService {
 
   //PUT
   update(callback:any,product:Product,path:string){
-    this.restManager.makePutRequest(ADDRESS_SERVER,REQUEST_PRODUCT+'/update/'+path,callback,product);
+    this.restManager.makePutRequest(ADDRESS_SERVER,REQUEST_PRODUCT+'/update/'+path,product,callback);
   }
-
-  //CREATE & DELETE
-  createProduct(product: Product){
-    this.restManager.makePostRequest(ADDRESS_SERVER,REQUEST_PRODUCT,this.creationSuccess.bind(this),product);
-  }
-
-  private creationSuccess(status:boolean,response:any){
-    if(status)
-      this.responseService.openDialogOk(response);
-  }
-
-  deleteProduct(id:number,callback:any){
-    this.restManager.makeDeleteRequest(ADDRESS_SERVER,REQUEST_PRODUCT+'/delete/'+id,callback);
-  }
-
 
 
 }

@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ResponseService } from 'src/app/helpers/Response/ResponseService.service';
 import { Cart } from 'src/app/models/Cart';
 import { Order } from 'src/app/models/Order';
-import { User, UserDTO, UserDTOImpl } from 'src/app/models/User';
+import { User } from 'src/app/models/User';
 import { CartService } from 'src/app/services/ModelServices/Cart.service';
 import { OrderService } from 'src/app/services/ModelServices/Order.service';
 
@@ -27,9 +27,7 @@ export class CartComponent implements OnInit{
   }
 
   acquire(){
-    var dto= new UserDTOImpl();
-    dto=dto.copyUser(this.user);
-    this.cartService.checkout(this.acquireSuccess.bind(this),dto);
+    this.cartService.checkout(this.acquireSuccess.bind(this),this.user);
   }
 
   private acquireSuccess(status:boolean,response:any){

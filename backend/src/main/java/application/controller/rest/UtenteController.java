@@ -18,7 +18,7 @@ import java.util.Optional;
 
 
 @RestController
-@CrossOrigin(origins = {"https://localhost:4200"})
+@CrossOrigin(origins = {"http://localhost:4200"})
 @RequestMapping("/user")
 public class UtenteController {
 
@@ -55,7 +55,7 @@ public class UtenteController {
         return utenteService.getUtentiByUsername(username);
     }
 
-    @PreAuthorize(value="hasRole('ROLE_Admin')")
+    @PreAuthorize("hasRole('ROLE_Admin')")
     @GetMapping("/all")
     public @ResponseBody List<Utente> readAll(){
         return utenteService.getUtenti();

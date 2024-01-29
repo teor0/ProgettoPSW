@@ -85,7 +85,7 @@ export class RestManager{
       return this.makeRequest(serverAddress, servicePath, "get", callback, body)
     }
 
-    public makePutRequest(serverAddress: string, servicePath: string, callback: any, body: any){
+    public makePutRequest(serverAddress: string, servicePath: string,  body: any, callback?: any,){
         return this.makeRequest(serverAddress, servicePath, "put", callback, body)
     }
 

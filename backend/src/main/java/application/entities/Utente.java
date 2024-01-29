@@ -41,12 +41,6 @@ public class Utente {
     private String email;
 
     @Basic
-    @Size(max=30)
-    @NotBlank
-    @Column(name = "password")
-    private String password;
-
-    @Basic
     @Size
     @Column(name = "role")
     private String role;

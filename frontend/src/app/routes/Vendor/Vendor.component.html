@@ -41,7 +41,7 @@
       <input matInput placeholder="Quantity" formControlName="quantity" required>
     </mat-form-field>
   </form>
-  <button mat-raised-button (click)="createProduct()">Create Product</button>
+  <button mat-raised-button (click)="createProduct()"><mat-icon>publish</mat-icon>Create Product</button>
   <button mat-raised-button (click)="showFormCreate()">Hide form</button>
 </div>
 <div class="searchContainer" *ngIf="!hideSearch" align="center">
@@ -152,6 +152,7 @@
       <button mat-icon-button (click)="delete(searchResult.id)"> <mat-icon>delete_forever</mat-icon></button>
     </mat-card-actions>
   </mat-card>
+  <button mat-raised-button (click)="hideSearchResult()" *ngIf="searchResult">Hide result</button>
   <button mat-raised-button (click)="hideSearchForm()">Hide form</button>
   <br>
   <mat-divider></mat-divider>

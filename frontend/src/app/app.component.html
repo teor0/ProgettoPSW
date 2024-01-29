@@ -2,21 +2,24 @@
   <a mat-tab-link
      (click)="activeLink=''" routerLink='' routerLinkActive="active"
      [active]="activeLink == ''"> Home  </a>
+  <a mat-tab-link  *ngIf="logged"
+    (click)="activeLink='User'" routerLink='User' routerLinkActive="active"
+    [active]="activeLink == 'User'"> User </a>
   <a mat-tab-link *ngIf="!logged"
     (click)="activeLink='Login'" routerLink='Login' routerLinkActive="active"
     [active]="activeLink == 'Login'"> Login  </a>
-  <a mat-tab-link *ngFor="let link of links"
-     (click)="activeLink=link" routerLink={{link}} routerLinkActive="active"
-     [active]="activeLink == link"> {{link}} </a>
+  <a mat-tab-link
+    (click)="activeLink='Product'" routerLink='Product' routerLinkActive="active"
+    [active]="activeLink == 'Product'"> Product  </a>
   <a mat-tab-link *ngIf="logged"
     (click)="activeLink='Order'" routerLink='Order' routerLinkActive="active"
     [active]="activeLink == 'Order'"> Order  </a>
   <a mat-tab-link *ngIf="isAdmin"
     (click)="activeLink='Admin'" routerLink='Admin' routerLinkActive="active"
     [active]="activeLink == 'Admin'"> Admin  </a>
-    <a mat-tab-link *ngIf="logged"
-     (click)="activeLink='Cart'" routerLink='Cart' routerLinkActive="active"
-     [active]="activeLink == 'Cart'"> Cart <mat-icon>shopping_cart</mat-icon></a>
+  <a mat-tab-link *ngIf="logged"
+    (click)="activeLink='Cart'" routerLink='Cart' routerLinkActive="active"
+    [active]="activeLink == 'Cart'"> Cart <mat-icon>shopping_cart</mat-icon></a>
 </nav>
 <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
 <router-outlet></router-outlet>

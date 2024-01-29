@@ -1,9 +1,11 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Order } from 'src/app/models/Order';
+import { KeycloakService } from 'keycloak-angular';
+import { Order, OrderImpl } from 'src/app/models/Order';
 import { Product, ProductImpl } from 'src/app/models/Product';
+import { User } from 'src/app/models/User';
+import { OrderService } from 'src/app/services/ModelServices/Order.service';
 import { OrderProductService } from 'src/app/services/ModelServices/OrderProduct.service';
-import { UserService } from 'src/app/services/ModelServices/User.service';
 
 @Component({
   selector: 'app-ProductDialog',
@@ -16,18 +18,20 @@ export class ProductDialogComponent implements OnInit{
   productToAdd!: Product;
   value=1;
   logged!: boolean;
+  user!:User;
+  order!:Order;
 
-  constructor(@Inject(MAT_DIALOG_DATA) private data: {
-                  productToAdd: Product;
-              },private dialogRef: MatDialogRef<ProductDialogComponent>,
-                private orderProductsService: OrderProductService, private userService:UserService){
-                  this.productToAdd = data.productToAdd;
+  constructor(@Inject(MAT_DIALOG_DATA) private data: {productToAdd: Product;},
+                    private dialogRef: MatDialogRef<ProductDialogComponent>, private orderService: OrderService,
+                    private orderProductsService: OrderProductService, private keycloakService:KeycloakService){
+        this.productToAdd = data.productToAdd;
+        if(sessionStorage.getItem('order')!=null)
+          this.order=JSON.parse(sessionStorage.getItem('order') as string) as Order;
+        this.user=JSON.parse(sessionStorage.getItem('user') as string) as User;
   }
 
-  ngOnInit(): void{
-    this.userService.logStatusChange.subscribe(async status=>{
-      this.logged=status;
-    });
+  async ngOnInit(){
+    this.logged = await this.keycloakService.isLoggedIn();
   }
 
   addTocart(product:Product, quantity:number){
@@ -40,13 +44,29 @@ export class ProductDialogComponent implements OnInit{
       sessionStorage.setItem('storedProducts',JSON.stringify(sp));
     }
     else{
-      var order=JSON.parse(sessionStorage.getItem('order') as string) as Order;
-      this.orderProductsService.createOP(order,cartProduct,quantity);
+      if(sessionStorage.getItem('order')===null){
+        this.order=new OrderImpl();
+        this.order.user=this.user;
+        this.orderService.createOrder(this.order);
+        this.orderProductsService.createOP(this.order,cartProduct,quantity);
+      }
+      else{
+        this.orderProductsService.createOP(this.order,cartProduct,quantity);
+      }
     }
+    this.closeAdd();
   }
 
-  closeDialog() {
-    this.dialogRef.close();
+  closeUndo(){
+    this.closeDialog('Undo');
+  }
+
+  closeAdd(){
+    this.closeDialog('Add');
+  }
+
+  closeDialog(action: 'Add' | 'Undo') {
+    this.dialogRef.close(action);
   }
 
 }

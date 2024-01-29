@@ -28,10 +28,6 @@ server:
   compression:
     enabled: 'true'
   port: 8082
-  ssl:
-    key-store-password: matteo
-    key-store-type: PKCS12
-    key-store: classpath:ssl/project.p12
   error:
     include-message: always
 
@@ -41,3 +37,8 @@ logging:
       springframework: INFO
 
 
+jwt:
+  auth:
+    converter:
+      resource-id: Project
+      principle-attribute: preferred_username
