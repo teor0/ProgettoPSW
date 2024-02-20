@@ -1,4 +1,4 @@
-import { Order, OrderDTO } from 'src/app/models/Order';
+import { OrderDTO } from 'src/app/models/Order';
 import { Component, Input, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { OrderService } from 'src/app/services/ModelServices/Order.service';
 import { User } from 'src/app/models/User';
@@ -48,18 +48,10 @@ export class ShowOrderComponent implements OnInit, AfterViewInit{
   setDataSourceAttributes() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-
-    if (this.paginator && this.sort) {
-      this.applyFilter('');
-    }
   }
 
-  applyFilter(filterValue: string) {
-    filterValue = filterValue.trim();
-    filterValue = filterValue.toLowerCase();
-    this.dataSource.filter = filterValue;
-  }
 
+  //DELETE
   delete(id:number){
     this.orderService.deleteOrder(id,this.successDelete.bind(this));
   }
@@ -72,6 +64,7 @@ export class ShowOrderComponent implements OnInit, AfterViewInit{
     }
   }
 
+  //SEARCH METHODS
   searchByUserPending(){
     this.orderService.getByUserAndPending(this.showResult.bind(this),this.user);
   }

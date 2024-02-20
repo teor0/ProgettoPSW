@@ -41,7 +41,6 @@ public class Utente {
     private String email;
 
     @Basic
-    @Size
     @Column(name = "role")
     private String role;
 

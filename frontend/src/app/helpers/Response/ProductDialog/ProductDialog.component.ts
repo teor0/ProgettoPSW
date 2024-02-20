@@ -39,19 +39,26 @@ export class ProductDialogComponent implements OnInit{
     cartProduct=cartProduct.copy(product);
     cartProduct.quantity=quantity;
     if(!this.logged){
-      var sp=JSON.parse(sessionStorage.getItem('storedProducts') as string) as Product[]
-      sp.push(cartProduct);
-      sessionStorage.setItem('storedProducts',JSON.stringify(sp));
+      var sp=JSON.parse(sessionStorage.getItem('storedProducts') as string) as Product[];
+      if(sp.find(p=> p.id === product.id))
+        sp.some(p=>{if(p.id === product.id){
+                      p.quantity+=quantity;
+                      sessionStorage.setItem('storedProducts',JSON.stringify(sp));
+                    }
+        })
+      else{
+        sp.push(cartProduct);
+        sessionStorage.setItem('storedProducts',JSON.stringify(sp));
+      }
     }
     else{
       if(sessionStorage.getItem('order')===null){
         this.order=new OrderImpl();
         this.order.user=this.user;
-        this.orderService.createOrder(this.order);
-        this.orderProductsService.createOP(this.order,cartProduct,quantity);
+        this.orderService.createWithOP(this.order,cartProduct,quantity);
       }
       else{
-        this.orderProductsService.createOP(this.order,cartProduct,quantity);
+        this.orderProductsService.create(this.order,cartProduct,quantity);
       }
     }
     this.closeAdd();

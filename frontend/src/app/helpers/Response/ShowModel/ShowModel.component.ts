@@ -23,6 +23,7 @@ export class ShowModelComponent{
     })
   }
 
+  //SEARCH METHODS
   searchByUsername(){
     this.userService.getUserByUsername(this.search.controls['searchControl'].value,this.showUser.bind(this));
   }
@@ -35,6 +36,9 @@ export class ShowModelComponent{
     this.userService.getUsersByName(this.showUsers.bind(this),this.search.controls['searchControl'].value);
   }
 
+
+
+  //SHOW METHODS
   showUser(status:boolean, response:any){
     if(status)
       this.userToDisplay=response;

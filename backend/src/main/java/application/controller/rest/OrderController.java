@@ -66,7 +66,7 @@ public class OrderController {
         catch (UtenteNotExistsException e) {
             return new ResponseEntity<>("User doesn't exists!", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity(o, HttpStatus.OK);
+        return new ResponseEntity<>(o, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")

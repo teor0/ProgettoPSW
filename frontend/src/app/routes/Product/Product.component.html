@@ -1,6 +1,7 @@
 <button mat-raised-button [matMenuTriggerFor]="menu">Products action Menu<mat-icon>menu</mat-icon></button>
 <mat-menu #menu="matMenu">
   <button mat-menu-item (click)="showSearchProduct()">Search a product</button>
+  <button mat-menu-item (click)="showFilter()">Filter the table</button>
 </mat-menu>
 <mat-divider></mat-divider>
 <br>
@@ -28,10 +29,6 @@
   </mat-card>
   <mat-divider></mat-divider>
   <br>
-  <mat-form-field>
-    <mat-label>Filter</mat-label>
-    <input matInput (keyup)="applyFilter(filterForm.value)" placeholder="Something" formControlName="filterForm">
-  </mat-form-field>
   <mat-table #table [dataSource]="dataSourceSearch" matSort *ngIf="!hideTab">
     <ng-container matColumnDef="id">
       <th mat-sort-header mat-header-cell *matHeaderCellDef> Id </th>
@@ -86,6 +83,14 @@
 <mat-divider></mat-divider>
 <br>
 <div class="product-tab" align="center">
+  <mat-form-field *ngIf="filter">
+      <mat-label>Filter</mat-label>
+      <input matInput (keyup)="applyFilter($event)" placeholder="Something" #input>
+  </mat-form-field>
+  <br>
+  <button mat-raised-button (click)="showFilter()" *ngIf="filter">Hide filter</button>
+  <br>
+  <br>
   <mat-table #table [dataSource]="dataSource" matSort *ngIf="showAll" >
     <ng-container matColumnDef="id">
       <th mat-sort-header mat-header-cell *matHeaderCellDef> Id </th>

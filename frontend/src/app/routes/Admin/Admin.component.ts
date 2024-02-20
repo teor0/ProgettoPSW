@@ -36,6 +36,9 @@ export class AdminComponent implements OnInit{
     this.dataSource.sort = this.sort;
   }
 
+
+
+
   deleteUser(id:number){
     this.userService.deleteUser(id,this.refreshTable.bind(this));
   }

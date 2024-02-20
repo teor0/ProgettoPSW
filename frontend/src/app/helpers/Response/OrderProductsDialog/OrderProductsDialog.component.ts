@@ -1,6 +1,5 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { KeycloakService } from 'keycloak-angular';
 import { OrderProducts } from 'src/app/models/Orderproducts';
 import { OrderProductService } from 'src/app/services/ModelServices/OrderProduct.service';
 

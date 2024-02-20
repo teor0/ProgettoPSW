@@ -1,5 +1,5 @@
 import { OrderProducts } from 'src/app/models/Orderproducts';
-import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ResponseComponent } from './Response.component';
@@ -64,6 +64,16 @@ export class ResponseService {
     }).afterClosed().subscribe((response)=>{
       if(response==='Add')
         this.openDialogCartOk()
+      });
+  }
+
+  openDialogAddCartCB(product: Product,callback:any):void {
+    this.dialog.open(ProductDialogComponent,{
+      data:{productToAdd:product}
+    }).afterClosed().subscribe((response)=>{
+      if(response==='Add')
+        this.openDialogCartOk()
+      callback();
       });
   }
 

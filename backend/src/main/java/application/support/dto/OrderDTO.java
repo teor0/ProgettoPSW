@@ -2,11 +2,14 @@ package application.support.dto;
 
 
 import application.entities.Order;
+import application.entities.OrderProducts;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 @ToString
@@ -20,6 +23,7 @@ public class OrderDTO{
     private Double total;
     private Date createDate;
     private String status;
+    private List<OrderProductsDTO> orderProducts;
 
     public OrderDTO(){
         this.id=0L;
@@ -27,6 +31,7 @@ public class OrderDTO{
         this.total=0.0;
         this.createDate=null;
         this.status="Pending";
+        this.orderProducts=new ArrayList<>();
     }
 
     public OrderDTO(Order o){
@@ -35,6 +40,9 @@ public class OrderDTO{
         this.total=o.getTotal();
         this.createDate=o.getCreateDate();
         this.status=o.getStatus();
+        this.orderProducts=new ArrayList<>();
+        for(OrderProducts op : o.getOrderProducts())
+            this.orderProducts.add(new OrderProductsDTO((op)));
     }
 
 }

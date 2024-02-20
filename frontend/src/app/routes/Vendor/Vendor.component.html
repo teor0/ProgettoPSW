@@ -5,6 +5,7 @@
   <button mat-menu-item (click)="showFormCreate()">Create a product</button>
   <button mat-menu-item (click)="showSearch()">Search product</button>
   <button mat-menu-item (click)="showPriceButtons()">Search product by price</button>
+  <button mat-menu-item (click)="showFilter()" [disabled]="hideTab">Filter the table</button>
 </mat-menu>
 <br>
 <br>
@@ -85,6 +86,13 @@
     </div>
   </div>
   <br/>
+  <br>
+  <mat-form-field *ngIf="filter">
+    <mat-label>Filter</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Something" #input>
+  </mat-form-field>
+  <br>
+  <button mat-raised-button (click)="showFilter()" *ngIf="filter">Hide filter</button>
   <br>
   <mat-table #table [dataSource]="dataSourceSearch" matSort *ngIf="!hideTab">
     <ng-container matColumnDef="id">

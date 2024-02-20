@@ -33,7 +33,8 @@ export class ProductComponent implements OnInit, AfterViewInit {
   }
 
   search: FormGroup;
-  filterForm!: FormControl;
+  filterForm!: FormGroup;
+  filter: boolean=false;
   hideSearchProduct: boolean=true;
   hideTab: boolean=true;
   products!:Product[];
@@ -48,7 +49,9 @@ export class ProductComponent implements OnInit, AfterViewInit {
                 this.search= new FormGroup({
                   searchControl: new FormControl(null)
                 })
-                this.filterForm=new FormControl(null)
+                this.filterForm=new FormGroup({
+                  filter: new FormControl(null)
+                })
   }
 
   ngOnInit(): void {
@@ -70,17 +73,23 @@ export class ProductComponent implements OnInit, AfterViewInit {
   setDataSourceAttributes() {
     this.dataSourceSearch.paginator = this.paginatorSearch;
     this.dataSourceSearch.sort = this.sortSearch;
-    if (this.paginatorSearch && this.sortSearch) {
-      this.applyFilter('');
-    }
   }
 
-  applyFilter(filterValue: string) {
-    filterValue = filterValue.trim();
-    filterValue = filterValue.toLowerCase();
-    this.dataSourceSearch.filter = filterValue;
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
+
+
+  //ADD
+  addToCart(product:Product){
+    this.responseService.openDialogAddCart(product);
+  }
+
+
+
+  //SEARCH
   searchByBarcode(){
     this.productService.getProductByBarcode(this.showProduct.bind(this),this.search.controls['searchControl'].value);
   }
@@ -89,9 +98,6 @@ export class ProductComponent implements OnInit, AfterViewInit {
     this.productService.getProductsByName(this.showProducts.bind(this),this.search.controls['searchControl'].value);
   }
 
-  addToCart(product:Product){
-    this.responseService.openDialogAddCart(product);
-  }
 
   //HIDE AND SHOW
   hideAll(){
@@ -101,6 +107,10 @@ export class ProductComponent implements OnInit, AfterViewInit {
   showProduct(status:boolean, response:Product){
     if(status)
       this.product=response;
+  }
+
+  showFilter(){
+    this.filter=!this.filter;
   }
 
   private showProducts(status:boolean, response:Product[]){

@@ -17,7 +17,6 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatOptionModule } from '@angular/material/core';
-//import { AuthInterceptor } from './helpers/AuthInterceptor';
 import { ErrorHandlerInterceptor } from './helpers/Error/ErrorInterceptor';
 import { ResponseComponent } from './helpers/Response/Response.component';
 import { LoginComponent } from './routes/Login/Login.component';
@@ -25,6 +24,7 @@ import { AdminComponent } from './routes/Admin/Admin.component';
 import { ShowModelComponent } from './helpers/Response/ShowModel/ShowModel.component';
 import { VendorComponent } from './routes/Vendor/Vendor.component';
 import { UserComponent } from './routes/User/User.component';
+import { PreviewCartComponent } from './routes/PreviewCart/PreviewCart.component';
 import { ProductComponent } from './routes/Product/Product.component';
 import { MatSortModule } from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
@@ -53,6 +53,7 @@ import { OrderProductsDialogComponent } from './helpers/Response/OrderProductsDi
     AdminComponent,
     UpdateDialogComponent,
     ProductDialogComponent,
+    PreviewCartComponent,
     LoginComponent,
     CompleteRegistrationComponent,
     CompleteLoginComponent,
@@ -93,7 +94,6 @@ import { OrderProductsDialogComponent } from './helpers/Response/OrderProductsDi
   ],
   providers: [
     { provide: APP_INITIALIZER, useFactory: initializeKeycloak, multi: true, deps: [KeycloakService, AuthService] },
-    //{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorHandlerInterceptor, multi:true}
   ],
   bootstrap: [AppComponent]

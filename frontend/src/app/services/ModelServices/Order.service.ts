@@ -30,14 +30,28 @@ export class OrderService {
 
   //CREATION & DELETE
   createOrder(order:Order){
-    this.restManager.makePostRequest(ADDRESS_SERVER,REQUEST_ORDER,this.creationSuccess.bind(this,order),order)
+    this.restManager.makePostRequest(ADDRESS_SERVER,REQUEST_ORDER,this.creationSuccess.bind(this),order)
   }
 
-  private creationSuccess(order:Order,status:boolean,response:any){
+  private creationSuccess(status:boolean,response:any){
     if(status){
       this.responseService.openDialogOk(response);
       this.getByUserAndPendingNoCallback(JSON.parse(sessionStorage.getItem('user') as string) as User);
     }
+  }
+
+  createWithOP(order:Order, product:Product, quantity:number){
+    this.restManager.makePostRequest(ADDRESS_SERVER,REQUEST_ORDER,this.orderProductCreation.bind(this,product,quantity),order);
+  }
+
+  private orderProductCreation(product: Product, quantity:number, status:boolean){
+    if(status)
+      this.getByUserAndPending(this.completeOrderCreation.bind(this,product,quantity),JSON.parse(sessionStorage.getItem('user') as string) as User);
+  }
+
+  private completeOrderCreation(product: Product, quantity:number, status:boolean, response:any){
+    if(status)
+      this.orderProductsService.create(response[0],product,quantity);
   }
 
   deleteOrder(id:number,callback:any){
@@ -73,7 +87,7 @@ export class OrderService {
       var storedProducts=JSON.parse(sessionStorage.getItem('storedProducts') as string) as Product[];
       if(storedProducts.length!=0){
         for(let p of storedProducts)
-          this.orderProductsService.createOP(order,p,p.quantity);
+          this.orderProductsService.create(order,p,p.quantity);
         sessionStorage.setItem('storedProducts',JSON.stringify([]));
       }
       this.cartService.initialGetCart(JSON.parse(sessionStorage.getItem('user') as string) as User);

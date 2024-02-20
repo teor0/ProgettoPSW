@@ -1,4 +1,4 @@
-import { OrderDTOImpl } from './../../models/Order';
+import { OrderDTO, OrderDTOImpl } from './../../models/Order';
 import { Component, OnInit } from '@angular/core';
 import { ResponseService } from 'src/app/helpers/Response/ResponseService.service';
 import { Cart } from 'src/app/models/Cart';
@@ -26,25 +26,7 @@ export class CartComponent implements OnInit{
     this.refreshCart();
   }
 
-  acquire(){
-    this.cartService.checkout(this.acquireSuccess.bind(this),this.user);
-  }
-
-  private acquireSuccess(status:boolean,response:any){
-    if(status){
-      this.responseService.openDialogOk(response);
-      sessionStorage.removeItem('order');
-      sessionStorage.removeItem('orderDTO');
-      this.hasOrder=false;
-      this.orderService.pendingChange.next(false);
-    }
-  }
-
-  delete(){
-    this.cartService.deleteCart(this.user.id);
-    this.hasOrder=false;
-  }
-
+  //INIT METHODS
   private retrieveOrder(){
     this.orderService.getByUserAndPendingNoCallback(this.user);
   }
@@ -62,6 +44,27 @@ export class CartComponent implements OnInit{
       sessionStorage.setItem('cart',JSON.stringify(response));
       this.hasOrder=true;
     }
+  }
+
+
+  //ACQUIRE & DELELTE
+  acquire(){
+    this.cartService.checkout(this.acquireSuccess.bind(this),JSON.parse(sessionStorage.getItem('orderDTO') as string) as OrderDTO);
+  }
+
+  private acquireSuccess(status:boolean,response:any){
+    if(status){
+      this.responseService.openDialogOk(response);
+      sessionStorage.removeItem('order');
+      sessionStorage.removeItem('orderDTO');
+      this.hasOrder=false;
+      this.orderService.pendingChange.next(false);
+    }
+  }
+
+  delete(){
+    this.cartService.deleteCart(this.user.id);
+    this.hasOrder=false;
   }
 
 

@@ -25,9 +25,9 @@ export class VendorComponent{
   hideForm=true;
   hideSearch=true;
   hideResult=true;
+  filter: boolean=false;
   hidePriceButtons: boolean=true;
   hideButtons: boolean=true;
-
   productsSearch!: Product[];
   dataSourceSearch= new MatTableDataSource<Product>();
   paginatorSearch!: MatPaginator;
@@ -70,17 +70,16 @@ export class VendorComponent{
   setDataSourceAttributes() {
     this.dataSourceSearch.paginator = this.paginatorSearch;
     this.dataSourceSearch.sort = this.sortSearch;
-    if (this.paginatorSearch && this.sortSearch) {
-      this.applyFilter('');
-    }
   }
 
-  applyFilter(filterValue: string) {
-    filterValue = filterValue.trim();
-    filterValue = filterValue.toLowerCase();
-    this.dataSourceSearch.filter = filterValue;
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSourceSearch.filter = filterValue.trim().toLowerCase();
   }
 
+
+
+  //CREATE & DELETE
   createProduct(){
     this.product=this.productForm.value
     this.productService.createProduct(this.product);
@@ -88,18 +87,6 @@ export class VendorComponent{
 
   deleteProduct(id:number){
     this.productService.deleteProduct(id,this.hideProduct.bind(this));
-  }
-
-
-  private showProducts(status:boolean, response:Product[]){
-    if(status){
-      this.productsSearch=response;
-      this.dataSourceSearch=new MatTableDataSource<Product>(this.productsSearch);
-      this.dataSourceSearch.paginator=this.paginatorSearch;
-      this.dataSourceSearch.sort=this.sortSearch;
-      if(this.hideTab)
-        this.hideTab=!this.hideTab;
-    }
   }
 
   delete(id:number){
@@ -136,6 +123,9 @@ export class VendorComponent{
     this.productService.getProductsByPriceBetween(this.showProducts.bind(this),this.searchBetweenForm.controls['minForm'].value, this.searchBetweenForm.controls['maxForm'].value);
   }
 
+
+
+
   //UPDATE
   updateBarcode(product: Product){
     this.responseService.openDialogUpdate(product,'barCode',this.searchByName.bind(this));
@@ -161,11 +151,28 @@ export class VendorComponent{
     this.responseService.openDialogUpdate(product,'category',this.searchByCat.bind(this));
   }
 
+
+
   //SHOW AND HIDE
   showFormCreate(){
     this.hideForm=!this.hideForm;
     if(!this.hideSearch)
       this.hideSearch=!this.hideSearch;
+  }
+
+  private showProducts(status:boolean, response:Product[]){
+    if(status){
+      this.productsSearch=response;
+      this.dataSourceSearch=new MatTableDataSource<Product>(this.productsSearch);
+      this.dataSourceSearch.paginator=this.paginatorSearch;
+      this.dataSourceSearch.sort=this.sortSearch;
+      if(this.hideTab)
+        this.hideTab=!this.hideTab;
+    }
+  }
+
+  showFilter(){
+    this.filter=!this.filter;
   }
 
   hideTable(){
@@ -213,8 +220,6 @@ export class VendorComponent{
     if(status)
       this.searchResult=undefined;
   }
-
-
 
 
 }

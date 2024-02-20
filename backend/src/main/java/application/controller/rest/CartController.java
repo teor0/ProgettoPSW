@@ -68,7 +68,7 @@ public class CartController {
     }
 
     @PostMapping("/checkout")
-    public ResponseEntity<JSONObject> acquireCart(@Valid @RequestBody UtenteDTO dto){
+    public ResponseEntity<JSONObject> acquireCart(@Valid @RequestBody OrderDTO dto){
         JSONObject response= new JSONObject();
         try {
             cartService.acquire(dto);

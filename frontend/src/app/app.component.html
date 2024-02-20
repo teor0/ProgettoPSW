@@ -17,6 +17,9 @@
   <a mat-tab-link *ngIf="isAdmin"
     (click)="activeLink='Admin'" routerLink='Admin' routerLinkActive="active"
     [active]="activeLink == 'Admin'"> Admin  </a>
+    <a mat-tab-link *ngIf="!logged"
+    (click)="activeLink='cart'" routerLink='cart' routerLinkActive="active"
+    [active]="activeLink == 'cart'"> Cart </a>
   <a mat-tab-link *ngIf="logged"
     (click)="activeLink='Cart'" routerLink='Cart' routerLinkActive="active"
     [active]="activeLink == 'Cart'"> Cart <mat-icon>shopping_cart</mat-icon></a>

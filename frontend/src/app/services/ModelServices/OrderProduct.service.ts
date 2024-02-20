@@ -19,10 +19,28 @@ export class OrderProductService {
   }
 
   //CREATE & DELETE
-  createOP(order:Order,product:Product, desiredQuantity:number){
-    var orderProducts=new OrderProductsImpl(order,product,desiredQuantity);
-    this.restManager.makePostRequest(ADDRESS_SERVER,REQUEST_ORDERPRODUCTS,this.creationSuccess.bind(this),orderProducts);
+  create(order:Order,product:Product, desiredQuantity:number){
+    this.getByOrderId(this.createOP.bind(this,order,product,desiredQuantity),order);
   }
+
+  private createOP(order:Order,product:Product, desiredQuantity:number, status:boolean, response:OrderProducts[]){
+    if(status){
+      if(response.some(op=> op.productId === product.id))
+          response.some((op)=>{ if(op.productId === product.id)
+                                this.addQuantity(op,desiredQuantity);
+                              });
+      else{
+        var orderProducts=new OrderProductsImpl(order,product,desiredQuantity);
+        this.restManager.makePostRequest(ADDRESS_SERVER,REQUEST_ORDERPRODUCTS,this.creationSuccess.bind(this),orderProducts);
+      }
+    }
+  }
+
+  private addQuantity(orderProducts: OrderProducts, toAdd: number){
+    orderProducts.quantity+=toAdd;
+    this.updateOP(orderProducts);
+  }
+
 
   deleteOP(id:number,callback:any){
     this.restManager.makeDeleteRequest(ADDRESS_SERVER,REQUEST_ORDERPRODUCTS+'/delete/'+id,callback)

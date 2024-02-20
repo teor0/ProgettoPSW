@@ -11,14 +11,12 @@ export class ResponseComponent{
   title: string='Response';
   msg!: string;
 
-  constructor(@Inject(MAT_DIALOG_DATA) private data: {
-      title: string;
-      msg: string;
-    },
-    private dialogRef: MatDialogRef<ResponseComponent>
-  ) {
-    if (data?.title) this.title = data.title;
-    if (data?.msg) this.msg = data.msg;
+  constructor(@Inject(MAT_DIALOG_DATA) private data: {title: string; msg: string;},
+                private dialogRef: MatDialogRef<ResponseComponent>) {
+    if (data?.title)
+      this.title = data.title;
+    if (data?.msg)
+      this.msg = data.msg;
   }
 
   closeDialog() {

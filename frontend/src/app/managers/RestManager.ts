@@ -2,14 +2,15 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 
 
 export class RestManager{
-    http: HttpClient;
 
+
+    http: HttpClient;
 
     constructor(http: HttpClient){
         this.http = http;
     }
 
-    //metodo generale che fa da scheletro N.B. la subscribe viene fatta nello scheletro
+    //metodo generale che fa da scheletro. N.B. la subscribe viene fatta nello scheletro
     private makeRequest(serverAddress: string, servicePath: string, method: string, callback: any, body?: any){
       const headers= new HttpHeaders({
         'Content-Type': 'application/json'
@@ -32,7 +33,6 @@ export class RestManager{
 
 
     public makePostRequest(serverAddress: string, servicePath: string,callback:any, body: any){
-      //return this.makeRequest(serverAddress,servicePath,"post",callback,body);
         this.http.post(serverAddress+servicePath,body).subscribe({
           next: (response: any) => {
               callback(true, response);

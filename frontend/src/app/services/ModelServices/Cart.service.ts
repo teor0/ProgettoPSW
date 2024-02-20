@@ -79,8 +79,8 @@ export class CartService {
   }
 
   //CHECKOUT METHOD
-  checkout(callback:any,user:User){
-    this.restManager.makePostRequest(ADDRESS_SERVER,REQUEST_CART+'/checkout',callback,user);
+  checkout(callback:any,order:OrderDTO){
+    this.restManager.makePostRequest(ADDRESS_SERVER,REQUEST_CART+'/checkout',callback,order);
   }
 
 }
